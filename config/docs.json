@@ -1,0 +1,25 @@
+{
+  "_comment": "Catalogue des documents réels servis par /api/docs. passwordHash: null = pas de mot de passe (accès à tout utilisateur connecté). 'doc' réutilise le mot de passe général de téléchargement (APPA2026), 'ppt' réutilise le mot de passe réservé Rémi/Mélissa (à changer avant mise en production réelle — voir README).",
+  "passwordGroups": {
+    "doc": "scrypt$3c7be420b26605990082ac5f889ed101$928797983952eb88a6cb84a8f02d237d26ac9535225c2f07d08f701032fc8f14a1560a72cae60f55f9fccfb1203de4f0a93c2bcb56b37b10318df71f0d9457be",
+    "ppt": "scrypt$adf46782433a56660a5346c91c16b784$7dc927d39022dadde764504875ce11ddcda697d4486d06bac0d4c514c5dcc66cee4b59dbdc7a7c7f05948121c8bf0be0737c2ad7fb7ff085bea4abe4c8914c44"
+  },
+  "documents": [
+    { "id": "brochure_appa", "titre": "Brochure APPA Services", "file": "Brochure_APPA_Services_2026.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "grille_tarifaire_2026", "titre": "Grille tarifaire 2026", "file": "Grille_Tarifaire_2026_APPA_Services.pdf", "mime": "application/pdf", "passwordGroup": "doc", "reservedTo": [] },
+    { "id": "brochure_bilan_autonomie", "titre": "Bilan autonomie — FP Diagnostique 2026", "file": "FP_Diagnostique_2026_APPA_Services.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "deck_prescripteurs", "titre": "Deck Prescripteurs", "file": "APPA_Services_Deck_Prescripteurs.pptx", "mime": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "passwordGroup": "ppt", "reservedTo": ["RE", "ME"] },
+    { "id": "mjpm_2026", "titre": "APPA Services — MJPM 2026", "file": "APPA_SERVICES_MJPM_2026.pptx", "mime": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "passwordGroup": "ppt", "reservedTo": ["RE", "ME"] },
+    { "id": "structure_services", "titre": "Présentation — Structure des Services", "file": "PRES_APPA_SERVICES_STRUCTURE_SERVICES.pptx", "mime": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "passwordGroup": "ppt", "reservedTo": ["RE", "ME"] },
+    { "id": "etayage_formules", "titre": "Étayage Formules APPA Services", "file": "ETAYAGE_FORMULES_APPASERVICES.docx", "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "passwordGroup": "ppt", "reservedTo": ["RE", "ME"] },
+    { "id": "montage_apa_cerfa", "titre": "APA — 13 CERFA médical", "file": "13_CERFA_Medical_APA.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_apa_certif", "titre": "APA — Certificat médical (83)", "file": "Certificat_Medical_83.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_dossier84", "titre": "ASH — 1 Dossier ASH (84)", "file": "1_Dossier_ASH_84.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_dvs", "titre": "ASH — 2 Dossier DVS", "file": "2_Dossier_DVS.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_oa", "titre": "ASH — 2 Obligation alimentaire (OA)", "file": "2_OA.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_ressources", "titre": "ASH — 7 Ressources mensuelles", "file": "7_Ressources_mensuelles.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_capitaux", "titre": "ASH — 8 Capitaux", "file": "8_Capitaux.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_ash_consequences", "titre": "ASH — 9 Conséquences de la PA", "file": "9_Consequences_PA.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] },
+    { "id": "montage_nir", "titre": "Renouvellement NIR", "file": "Renouvellement_NIR.pdf", "mime": "application/pdf", "passwordGroup": null, "reservedTo": [] }
+  ]
+}

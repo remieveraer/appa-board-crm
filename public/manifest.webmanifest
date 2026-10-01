@@ -1,0 +1,16 @@
+{
+  "name": "APPA SERVICES",
+  "short_name": "APPA SERVICES",
+  "description": "Board CRM interne APPA Services — administratif, coordination médico-sociale, tâches d'équipe et planning RDV",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf9f5",
+  "theme_color": "#00497a",
+  "lang": "fr",
+  "icons": [
+    { "src": "/icons/icon-192.png?v=2", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png?v=2", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-180.png?v=2", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

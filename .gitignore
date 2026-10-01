@@ -1,0 +1,15 @@
+node_modules/
+.env
+*.log
+npm-debug.log*
+.DS_Store
+
+# Backups locaux de board.html (snapshots de travail Claude, pas le code à déployer)
+backups/
+
+# Données brutes de migration Excel -> Postgres (PII clients/prestataires, migration ponctuelle
+# déjà appliquée en base — ne doit jamais atterrir dans l'historique git)
+migration-data/
+
+# Backups de travail de board.html laissés dans public/ (ne doivent pas être servis en statique)
+public/*.bak

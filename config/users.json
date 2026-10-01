@@ -1,0 +1,36 @@
+{
+  "pinHash": "scrypt$ccffb6de3f6a83cf0a4206f8ead60bbd$fa1a0d43670894f4600d50db9ef87d51b06cbae13de4975a67b0894f5e132340f7de6322a142cb1c2dc0f2de4112c41dcf2e0514cddb793a3864009471e649fd",
+  "identities": [
+    {
+      "code": "RE",
+      "name": "Rémi Everaer",
+      "passwordHash": "scrypt$381c029ae3688abc17b4e79fa3299814$1271bd3b7a54ac926f4c7af419e4818c3b6e9c7235b5189a84028180cb189661dc1de7628b0199ffc5f81a560ba332be8399f0549381596c70b748a281b46b29"
+    },
+    {
+      "code": "ME",
+      "name": "Mélissa Everaer",
+      "passwordHash": "scrypt$3dec19793d85a1a93d6bf3e6a144e7a1$60a2c3709cc16b6aa540ab8421506968dae5cad09724a361b7382875cee65a7756b8b311a98a4d77cc36eb25822c7487a0b0e299eee25bb9a6ff4593b0457ee9"
+    },
+    {
+      "code": "CG",
+      "name": "Cindy Grech",
+      "passwordHash": "scrypt$585ffb92c708f9104b85a814fa0bfa32$7e25156b33ab228cb9d7a1c6a696e4c3e124fd62cc80c95a119cd974162d64c7296148018dd70e313184b2147d051c0204f46224808a035930390de5deb617e9"
+    },
+    {
+      "code": "II",
+      "name": "Inda",
+      "passwordHash": "scrypt$8d191bb304737f1e8b6cb46d965fd91b$4898e24772221dcc2d78c610eb4624a0a06c8c5e8b415c3fe89e911f533dae27863b5aa43dea7ece4f826d61cf4bda3539a2107b5260a1458e82aa8ba7937bc4"
+    },
+    {
+      "code": "AC",
+      "name": "Ala Chouial",
+      "passwordHash": "scrypt$6a717afd8d3d31d56b9fe56aa18b2392$3db76802bcbaee9c94512b20c3867cbe562ac233ac7eba7cd95bfcbe66bc7e43a87fc7437b0cac3a696f1fbb4e1c57275ccd1825855df80295199d90926ba196"
+    },
+    {
+      "code": "RL",
+      "name": "Romain Lotito",
+      "passwordHash": "scrypt$9b95a9bad7e1e202fd4b0a60f8137d17$af18e1ebc1948dfdcef68a765c7ebc4404c70301ab1cbd2ff2765b6d766c6c587a8a2f4e933b6b91508ef2758937c57c488e5e937bcf7aaf0d4068c0b7f085c5"
+    }
+  ],
+  "generatedAt": "2026-09-30T00:00:00.000Z"
+}
