@@ -251,7 +251,23 @@ class PgClient {
     // événement "readable" que si la file est vide.
     const queued = this.reader.shift();
     if (queued) return Promise.resolve(queued);
+    // Incident du 12/10/2026 : une connexion TCP peut rester "à moitié
+    // morte" (coupure réseau silencieuse entre le dyno Scalingo et la base,
+    // reap d'une connexion idle...) sans jamais émettre "error" ni "close" —
+    // juste plus aucune donnée. Comme toutes les requêtes de tout le process
+    // sont sérialisées sur cette unique connexion (_queue, voir
+    // constructeur), une seule requête bloquée indéfiniment gèle alors TOUTE
+    // la base pour TOUS les onglets/collections jusqu'au redémarrage manuel
+    // du dyno — exactement le symptôme observé (toutes les routes /api/db/*
+    // en 504 simultanément). Un timeout ici force la fermeture de la socket
+    // dès qu'une réponse met trop longtemps à arriver : la requête en cours
+    // échoue proprement (au lieu de pendre indéfiniment) et la fermeture de
+    // la socket déclenche la reconnexion automatique déjà prévue dans
+    // src/db.js (c.on("error", ...) -> client = null) pour la requête
+    // suivante.
+    const timeoutMs = this.opts.queryTimeoutMs || 15000;
     return new Promise((resolve, reject) => {
+      let timer = null;
       const onReadable = () => {
         cleanup();
         const msg = this.reader.shift();
@@ -266,14 +282,28 @@ class PgClient {
         cleanup();
         reject(new Error("Connexion PostgreSQL fermée de manière inattendue"));
       };
+      const onTimeout = () => {
+        cleanup();
+        const err = new Error(
+          `Délai PostgreSQL dépassé (${timeoutMs}ms sans réponse du serveur) — connexion probablement figée, fermeture forcée pour reconnexion automatique`
+        );
+        try {
+          this.socket.destroy(err);
+        } catch (e) {
+          // déjà fermée, tant pis
+        }
+        reject(err);
+      };
       const cleanup = () => {
         this.reader.removeListener("readable", onReadable);
         this.socket.removeListener("error", onErr);
         this.socket.removeListener("close", onClose);
+        if (timer) clearTimeout(timer);
       };
       this.reader.once("readable", onReadable);
       this.socket.once("error", onErr);
       this.socket.once("close", onClose);
+      timer = setTimeout(onTimeout, timeoutMs);
     });
   }
 
