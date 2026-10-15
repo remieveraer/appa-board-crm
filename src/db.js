@@ -61,6 +61,13 @@ async function list(collection, sinceMs) {
   return r.rows.map(rowToDoc);
 }
 
+/** Noms de toutes les collections présentes en base (lecture seule — utilisé par l'export de sauvegarde). */
+async function listCollections() {
+  const c = await getClient();
+  const r = await c.query("SELECT DISTINCT collection FROM documents ORDER BY collection ASC");
+  return r.rows.map((row) => row.collection);
+}
+
 /** Un document précis, ou null s'il n'existe pas. */
 async function get(collection, id) {
   const c = await getClient();
@@ -117,4 +124,4 @@ function rowToDoc(row) {
   };
 }
 
-module.exports = { list, get, add, set, update, remove, getClient, newId };
+module.exports = { list, get, add, set, update, remove, listCollections, getClient, newId };

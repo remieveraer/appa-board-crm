@@ -247,6 +247,77 @@ async function handleDocDownload(req, res, session, docId) {
   fs.createReadStream(filePath).pipe(res);
 }
 
+// ---------- Export de sauvegarde (/api/export/xlsx, /api/export/json) ----------
+// Accès LECTURE SEULE par jeton secret (variable d'environnement EXPORT_TOKEN,
+// à poser par le dirigeant sur Scalingo — jamais dans le code). Prévu pour la
+// tâche planifiée hebdomadaire de sauvegarde : pas de session utilisateur
+// nécessaire, donc rien ne casse quand une session expire. Désactivé (404) tant
+// que EXPORT_TOKEN n'est pas défini ou s'il fait moins de 32 caractères.
+
+const { buildWorkbook } = require("./xlsxExport");
+
+function exportEnabled() {
+  const t = process.env.EXPORT_TOKEN || "";
+  return t.length >= 32;
+}
+
+function sha256(s) {
+  return crypto.createHash("sha256").update(String(s)).digest();
+}
+
+function exportTokenOk(req) {
+  const header = String(req.headers["authorization"] || "");
+  const m = header.match(/^Bearer\s+(.+)$/i);
+  if (!m) return false;
+  return crypto.timingSafeEqual(sha256(m[1].trim()), sha256(process.env.EXPORT_TOKEN));
+}
+
+function parisDateStamp() {
+  // AAAA-MM-JJ à l'heure de Paris
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(new Date());
+}
+
+async function handleExport(req, res, kind) {
+  if (!exportEnabled()) return sendJson(res, 404, { error: "Route inconnue" });
+  const key = clientKey(req, "export");
+  if (rateLimiter.isLocked(key)) {
+    return sendJson(res, 429, { error: "Trop de tentatives.", retryAfterSeconds: rateLimiter.remainingLockoutSeconds(key) });
+  }
+  if (!exportTokenOk(req)) {
+    rateLimiter.recordFailure(key);
+    return sendJson(res, 401, { error: "Jeton invalide" });
+  }
+  rateLimiter.recordSuccess(key);
+
+  const names = await db.listCollections();
+  const collections = [];
+  for (const name of names) collections.push({ name, docs: await db.list(name) });
+  const exportedAtIso = new Date().toISOString();
+  const stamp = parisDateStamp();
+
+  if (kind === "json") {
+    const body = Buffer.from(JSON.stringify({ exportedAt: exportedAtIso, collections }), "utf8");
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": body.length,
+      "Content-Disposition": `attachment; filename="Export_Board_APPA_${stamp}.json"`,
+      "Cache-Control": "no-store",
+    });
+    return res.end(body);
+  }
+
+  const { buffer, summary } = buildWorkbook(collections, { exportedAtIso });
+  res.writeHead(200, {
+    "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "Content-Length": buffer.length,
+    "Content-Disposition": `attachment; filename="Export_Board_APPA_${stamp}.xlsx"`,
+    "X-Export-Documents": String(summary.reduce((a, s) => a + s.documents, 0)),
+    "X-Export-Collections": String(summary.length),
+    "Cache-Control": "no-store",
+  });
+  return res.end(buffer);
+}
+
 // ---------- Fichiers statiques (la page board.html) ----------
 
 function serveStatic(req, res, urlPath) {
@@ -287,6 +358,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && urlPath === "/api/auth/logout") return await handleLogout(req, res);
     if (req.method === "GET" && urlPath === "/api/auth/me") return await handleMe(req, res);
     if (req.method === "GET" && urlPath === "/api/health") return sendJson(res, 200, { ok: true });
+
+    // Export de sauvegarde : authentification par jeton dédié (pas de session)
+    if (req.method === "GET" && urlPath === "/api/export/xlsx") return await handleExport(req, res, "xlsx");
+    if (req.method === "GET" && urlPath === "/api/export/json") return await handleExport(req, res, "json");
 
     // Tout le reste de /api/ exige une session valide
     const session = requireSession(req);
