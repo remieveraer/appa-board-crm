@@ -60,6 +60,7 @@
     --plan-aide-bg:#f3f0fb; --plan-aide-border:#cdc3ee; --plan-aide-strong:#4a3aa7;
     --avenant-bg:#fffaf0; --avenant-border:#eda100;
     --interne-bg:#eef0f2; --interne-border:#7c8896; --interne-strong:#4b5768; --interne-ink:#333d47;
+    --heurestrav-bg:#e3f3f5; --heurestrav-border:#4fa8b5; --heurestrav-ink:#154b53;
     color-scheme: light;
   }
   /* ===== V4 — barre synchronisation ===== */
@@ -178,9 +179,9 @@
   .banner-v2 { background:#fff3d6; border:1.5px solid #e0ad2a; border-radius:10px; padding:10px 16px; font-size:11.5px; color:#5c4400; margin-bottom:16px; line-height:1.55; font-weight:600; }
 
   /* tabs — V8 : pastilles premium (émoticône + nom), fini le look "classeur d'école" */
-  .tabs-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:9px; margin-bottom:4px; } /* V36 — grid (et non plus flex-wrap) : évite qu'un bouton isolé sur la dernière ligne s'étire seul sur toute la largeur (cas "GRH interne", demande Rémi 09/11/2026) */
-  .tab-btn { position:relative; flex:1; min-width:132px; padding:13px 14px 12px; border-radius:14px; font-weight:800; font-size:12.5px; text-align:center; border:none; cursor:pointer; opacity:.62; background:var(--surface); box-shadow:0 1px 3px rgba(11,11,11,.07); }
-  .tab-btn .tb-ic { display:block; font-size:18px; margin-bottom:3px; line-height:1; }
+  .tabs-row { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); gap:6px; margin-bottom:4px; } /* V37 (demande Rémi 11/11/2026) — 9 colonnes fixes : les 9 onglets restent TOUJOURS sur une seule ligne (plus d'auto-fit qui faisait passer "Fil de discussion" seul sur une 2e ligne), les boutons se compactent au lieu de wrapper */
+  .tab-btn { position:relative; padding:9px 3px 8px; border-radius:12px; font-weight:800; font-size:10px; text-align:center; border:none; cursor:pointer; opacity:.62; background:var(--surface); box-shadow:0 1px 3px rgba(11,11,11,.07); }
+  .tab-btn .tb-ic { display:block; font-size:15px; margin-bottom:2px; line-height:1; }
   .tab-btn .tb-lbl { display:block; letter-spacing:.01em; }
   .tab-badge { position:absolute; top:-6px; right:-4px; background:var(--warn,#c0392b); color:#fff; font-size:9.5px; font-weight:800; min-width:17px; height:17px; border-radius:999px; display:flex; align-items:center; justify-content:center; padding:0 4px; line-height:1; box-shadow:0 1px 3px rgba(0,0,0,.25); }
 
@@ -308,24 +309,31 @@
 
   /* MAJ 11/11/2026 (demande Rémi) — organigramme : couples (ex. Rémi+Mélissa) toujours côte à côte
      (nouveau conteneur .org-persons-row, réutilisé au niveau codir ET dans chaque org-box de branche),
-     + passe de polish visuel (ombres douces, meilleurs contrastes, respiration) demandée "au maximum". */
-  #tab8 .org-chart{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px;}
-  #tab8 .org-box{border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;background:var(--surface);text-align:center;box-shadow:0 2px 6px rgba(20,30,50,.06);}
-  #tab8 .org-box.groupe{background:linear-gradient(135deg,#2a3c6e,#3c4f8a);border-color:#2a3c6e;color:#fff;font-weight:800;font-size:13px;letter-spacing:.4px;padding:10px 20px;box-shadow:0 3px 10px rgba(42,60,110,.25);}
-  #tab8 .org-box.codir{background:#eef0f8;border-color:#b8bfe0;}
-  #tab8 .org-box.appa59{background:#eaf6ec;border-color:#8fcb9c;}
-  #tab8 .org-box.appa13{background:#fdeeea;border-color:#e8a68f;}
-  #tab8 .org-box.poste{background:#fff8e1;border-color:#e3c878;}
-  #tab8 .org-box.poste.transversal{background:#eaf1fb;border-color:#9bbbe0;}
-  #tab8 .org-connector{width:2px;height:18px;background:linear-gradient(var(--border),var(--border));margin:0 auto;}
-  #tab8 .org-row{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:0;}
-  #tab8 .org-branch{display:flex;flex-direction:column;align-items:center;}
-  #tab8 .org-branch-label{font-weight:800;font-size:12px;margin-bottom:6px;letter-spacing:.2px;}
-  #tab8 .org-persons-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-  #tab8 .org-person{display:flex;align-items:center;gap:7px;justify-content:center;margin:3px 0;text-align:left;}
-  #tab8 .org-name{font-weight:700;font-size:11.5px;display:block;}
-  #tab8 .org-role{font-size:9.5px;color:var(--ink-muted);display:block;margin-top:1px;}
-  #tab8 .org-children{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:0;}
+     + passe de polish visuel (ombres douces, meilleurs contrastes, respiration) demandée "au maximum".
+     CORRECTIF 12/11/2026 (bug remonté par Rémi) : ces règles étaient scopées "#tab8 ..." (onglet KPI
+     d'origine). Quand l'organigramme a été réutilisé dans l'onglet GRH (Onglet 7 — vue équipe admin,
+     branche "GRH Franchise" de Romain, puis fiche individuelle de chaque salarié), AUCUNE de ces règles
+     ne s'appliquait hors de #tab8 : résultat, un simple empilement de texte sans boîtes, sans couleurs,
+     sans traits de liaison — pas du tout l'organigramme visuel "avec branches/liens" attendu. Dé-scopé
+     ici (classes génériques, plus de préfixe #tab8) pour que le rendu soit identique et correct partout
+     où .org-chart est utilisé : Onglet 8 KPI, Onglet 7 GRH (équipe, Romain, fiche individuelle). */
+  .org-chart{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px;}
+  .org-box{border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;background:var(--surface);text-align:center;box-shadow:0 2px 6px rgba(20,30,50,.06);}
+  .org-box.groupe{background:linear-gradient(135deg,#2a3c6e,#3c4f8a);border-color:#2a3c6e;color:#fff;font-weight:800;font-size:13px;letter-spacing:.4px;padding:10px 20px;box-shadow:0 3px 10px rgba(42,60,110,.25);}
+  .org-box.codir{background:#eef0f8;border-color:#b8bfe0;}
+  .org-box.appa59{background:#eaf6ec;border-color:#8fcb9c;}
+  .org-box.appa13{background:#fdeeea;border-color:#e8a68f;}
+  .org-box.poste{background:#fff8e1;border-color:#e3c878;}
+  .org-box.poste.transversal{background:#eaf1fb;border-color:#9bbbe0;}
+  .org-connector{width:2px;height:18px;background:linear-gradient(var(--border),var(--border));margin:0 auto;}
+  .org-row{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:0;}
+  .org-branch{display:flex;flex-direction:column;align-items:center;}
+  .org-branch-label{font-weight:800;font-size:12px;margin-bottom:6px;letter-spacing:.2px;}
+  .org-persons-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .org-person{display:flex;align-items:center;gap:7px;justify-content:center;margin:3px 0;text-align:left;}
+  .org-name{font-weight:700;font-size:11.5px;display:block;}
+  .org-role{font-size:9.5px;color:var(--ink-muted);display:block;margin-top:1px;}
+  .org-children{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:0;}
 
   /* Sous-onglets "Mon agence 59 / Agence 13" pour Romain Lotito (demande Rémi 11/11/2026) — même palette
      que l'organigramme (vert 59 / corail 13) pour une cohérence visuelle immédiate dans tout l'outil. */
@@ -557,6 +565,12 @@
   .sub-tab-btn { padding:8px 14px; border-radius:999px; border:1.5px solid var(--tab5-strong); background:var(--surface); color:var(--tab5-ink); font-weight:700; font-size:12px; cursor:pointer; opacity:.6; }
   .sub-tab-btn.active { opacity:1; background:var(--tab5-strong); color:#fff; }
   .annu-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; width:280px; }
+  /* MAJ 11/11/2026 (demande Rémi) : Annuaire "ça fait longue liste peu exploitable" — #t5list hérite de
+     .card-row (display:flex; flex-direction:column) comme Onglet 1/2, ce qui empile une carte par ligne.
+     On surcharge UNIQUEMENT #t5list (sélecteur par id, ne touche pas .card-row ni t1list/t2list) en grille
+     responsive 2-3 colonnes — garde le même format "fiche carte", juste plusieurs par ligne. */
+  #t5list { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px; align-items:start; }
+  #t5list .annu-card { width:auto; }
   .annu-card .annu-type { display:inline-block; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.02em; color:var(--tab5-ink); background:var(--tab5-bg); border:1px solid var(--tab5-strong); border-radius:999px; padding:2px 9px; margin-bottom:6px; }
   .annu-card .annu-nom { font-size:14px; font-weight:800; display:block; margin-bottom:4px; }
   .annu-card .annu-field { font-size:11.5px; color:var(--ink-2); margin-bottom:2px; }
@@ -946,7 +960,7 @@
     <button class="tab-btn t8" id="btnTab8" onclick="showTab(8)"><span class="tb-ic">📊</span><span class="tb-lbl">KPI &amp; Projections</span></button>
     <button class="tab-btn t1 active" id="btnTab1" onclick="showTab(1)"><span class="tb-ic">📚</span><span class="tb-lbl">Administratif</span></button>
     <button class="tab-btn t2" id="btnTab2" onclick="showTab(2)"><span class="tb-ic">🗃️</span><span class="tb-lbl">Opérationnel</span></button>
-    <button class="tab-btn t3" id="btnTab3" onclick="showTab(3)"><span class="tb-ic">☑️</span><span class="tb-lbl">Tâche Bénéficiaire</span></button>
+    <button class="tab-btn t3" id="btnTab3" onclick="showTab(3)"><span class="tb-ic">☑️</span><span class="tb-lbl">Tasking</span></button>
     <button class="tab-btn t4" id="btnTab4" onclick="showTab(4)"><span class="tb-ic">🗓️</span><span class="tb-lbl">Calendrier</span></button>
     <button class="tab-btn t5" id="btnTab5" onclick="showTab(5)"><span class="tb-ic">📇</span><span class="tb-lbl">Annuaire</span></button>
     <button class="tab-btn t6" id="btnTab6" onclick="showTab(6)"><span class="tb-ic">🗄️</span><span class="tb-lbl">Ressources</span></button>
@@ -1402,26 +1416,21 @@
         <div class="tile">
           <div class="tile-label">Clients par statut</div>
           <div class="pie-wrap">
-            <div class="pie sm" style="background:conic-gradient(var(--stat3-1) 0% 70%, var(--stat3-2) 70% 82%, var(--stat3-3) 82% 100%);"></div>
-            <div class="legend">
-              <div class="lg"><span class="sw" style="background:var(--stat3-1)"></span>Actif — 70% (214)</div>
-              <div class="lg"><span class="sw" style="background:var(--stat3-2)"></span>En cours — 12% (38)</div>
-              <div class="lg"><span class="sw" style="background:var(--stat3-3)"></span>Prospect — 18% (52)</div>
-            </div>
+            <div class="pie sm" id="tile-clientstatut-pie" style="background:conic-gradient(var(--ink-muted) 0% 100%);"></div>
+            <div class="legend" id="tile-clientstatut-legend"></div>
           </div>
-          <div class="tile-trend">▲ portefeuille en croissance — donnée fictive</div>
+          <div class="tile-trend">Donnée réelle — répartition en direct du portefeuille clients (tous statuts)</div>
         </div>
         <div class="tile">
           <div class="tile-label">Taux transformation Prospect→Client</div>
-          <div class="tile-value">34% <small>glissant 90j</small></div>
-          <svg class="spark" viewBox="0 0 200 30" preserveAspectRatio="none"><polyline points="0,22 30,20 60,21 90,17 120,15 150,12 180,10" fill="none" stroke="#4a3aa7" stroke-width="2.5"/></svg>
-          <div class="tile-trend">▲ +3 pts — donnée fictive</div>
+          <div class="tile-value">— <small>n/d</small></div>
+          <div class="tile-trend">⚪ Non calculable pour l'instant — l'app ne trace pas encore la date de passage Prospect → Client (seul le statut actuel est connu, pas son historique) ; pas de taux inventé ici</div>
         </div>
         <div class="tile">
           <div class="tile-label">Évolution nombre de clients</div>
-          <div class="tile-value">+18 <small>sur 6 mois</small></div>
+          <div class="tile-value" id="tile-evolclients-value">— <small>sur 6 mois</small></div>
           <svg class="spark" viewBox="0 0 200 30" preserveAspectRatio="none"><polyline points="0,25 30,23 60,20 90,18 120,14 150,11 180,6" fill="none" stroke="#0f9d70" stroke-width="2.5"/></svg>
-          <div class="tile-trend">▲ tendance haussière — donnée fictive</div>
+          <div class="tile-trend" id="tile-evolclients-trend">Donnée réelle — nouveaux dossiers créés (champ createdAt) sur les 6 derniers mois</div>
         </div>
         <div class="tile groupe">
           <span class="groupe-only">GROUPE</span>
@@ -1498,25 +1507,22 @@
       <div class="tile-grid">
         <div class="tile">
           <div class="tile-label">Effectif suivi (fiches GRH interne)</div>
-          <div class="tile-value">5 <small>RE, ME, CG, OC, AC</small></div>
+          <div class="tile-value" id="tile-effectif-grh-value">— <small id="tile-effectif-grh-small"></small></div>
           <svg class="spark" viewBox="0 0 200 30" preserveAspectRatio="none"><polyline points="0,20 30,19 60,18 90,16 120,16 150,14 180,13" fill="none" stroke="#7a4fb0" stroke-width="2.5"/></svg>
-          <div class="tile-trend">Romain (APPA 59) hors périmètre — donnée fictive</div>
+          <div class="tile-trend">Romain (APPA 59) hors périmètre — donnée réelle (GRH_IDENTITIES, Onglet 7)</div>
         </div>
         <div class="tile">
           <div class="tile-label">Répartition par type de contrat</div>
           <div class="pie-wrap">
-            <div class="pie" style="background:conic-gradient(var(--brand-navy) 0% 80%, var(--formule-1) 80% 100%);"></div>
-            <div class="legend">
-              <div class="lg"><span class="sw" style="background:var(--brand-navy)"></span>CDI — 80% (4)</div>
-              <div class="lg"><span class="sw" style="background:var(--formule-1)"></span>Apprentissage/Stage — 20% (1)</div>
-            </div>
+            <div class="pie" id="tile-contrat-grh-pie" style="background:conic-gradient(var(--brand-navy) 0% 100%);"></div>
+            <div class="legend" id="tile-contrat-grh-legend"></div>
           </div>
         </div>
         <div class="tile">
           <div class="tile-label">Ancienneté moyenne</div>
-          <div class="tile-value">1,8 <small>an</small></div>
+          <div class="tile-value" id="tile-anciennete-grh-value">— <small>an</small></div>
           <svg class="spark" viewBox="0 0 200 30" preserveAspectRatio="none"><polyline points="0,27 30,24 60,21 90,18 120,15 150,11 180,7" fill="none" stroke="#0a5686" stroke-width="2.5"/></svg>
-          <div class="tile-trend">Calculée depuis dateEntrée des fiches — donnée fictive</div>
+          <div class="tile-trend" id="tile-anciennete-grh-trend">Calculée depuis dateEmbauche des fiches GRH (Onglet 7) — donnée réelle</div>
         </div>
         <div class="tile" id="tile-echeance-contrat-grh">
           <div class="tile-label">🔔 Échéance contrat à surveiller<span class="k8-newtag">NEW</span></div>
@@ -1525,39 +1531,35 @@
         </div>
         <div class="tile alert">
           <div class="tile-label">Taux d'absentéisme (cumul année)</div>
-          <div class="tile-value" style="color:var(--warn);">2,4% <small>toutes causes</small></div>
+          <div class="tile-value" style="color:var(--warn);" id="tile-absenteisme-grh-value">— <small>toutes causes</small></div>
           <svg class="spark" viewBox="0 0 200 30" preserveAspectRatio="none"><polyline points="0,20 30,18 60,22 90,16 120,19 150,14 180,17" fill="none" stroke="var(--warn)" stroke-width="2.5"/></svg>
-          <div class="tile-trend">Norme secteur SAP ≈ 8-10% — effectif restreint, donnée fictive</div>
+          <div class="tile-trend" id="tile-absenteisme-grh-trend">Donnée réelle — (jours CP + maladie / jours ouvrés théoriques) × 100, depuis le 1er janvier</div>
         </div>
         <div class="tile">
           <div class="tile-label">Taux de présence (cumul année)<span class="k8-newtag">NEW</span></div>
-          <div class="tile-value" style="color:var(--good);">97,6% <small>toutes causes</small></div>
-          <div class="tile-trend">= 100% − taux d'absentéisme — donnée fictive</div>
+          <div class="tile-value" style="color:var(--good);" id="tile-presence-grh-value">— <small>toutes causes</small></div>
+          <div class="tile-trend">= 100% − taux d'absentéisme — donnée réelle</div>
         </div>
         <div class="tile">
           <div class="tile-label">Taux AT/AM (cumul année)<span class="k8-newtag">NEW</span></div>
-          <div class="tile-value" style="color:var(--good);">0% <small>accidents / maladies pro.</small></div>
-          <div class="tile-trend">Aucun accident du travail ni maladie professionnelle déclaré cette année — donnée fictive</div>
+          <div class="tile-value" style="color:var(--good);">— <small>accidents / maladies pro.</small></div>
+          <div class="tile-trend">⚪ Non suivi dans l'outil pour l'instant (aucun module de déclaration d'accident du travail) — pas de donnée fiable à afficher ici</div>
         </div>
         <div class="tile">
           <div class="tile-label">Arrêts maladie (cumul année)</div>
-          <div class="tile-value">3 <small>arrêts · 14 j cumulés</small></div>
-          <div class="tile-trend">1 salarié concerné sur 5 — donnée fictive</div>
+          <div class="tile-value" id="tile-arretsmaladie-grh-value">— <small>arrêts · j cumulés</small></div>
+          <div class="tile-trend" id="tile-arretsmaladie-grh-trend">Donnée réelle — déclarations d'arrêt maladie des fiches GRH (Onglet 7)</div>
         </div>
         <div class="tile">
-          <div class="tile-label">Congés payés — pris / acquis</div>
-          <div class="tile-value" style="font-size:16px;">18 / 25 <small>jours (moy./salarié)</small></div>
-          <div class="tile-trend">Solde restant à planifier avant fin d'exercice — donnée fictive</div>
+          <div class="tile-label">Congés payés — pris / solde restant</div>
+          <div class="tile-value" style="font-size:16px;" id="tile-cp-grh-value">— <small>jours</small></div>
+          <div class="tile-trend" id="tile-cp-grh-trend">Donnée réelle — jours CP posés cette année + solde restant moyen (fiches GRH)</div>
         </div>
         <div class="tile">
           <div class="tile-label">Répartition des absences</div>
           <div class="pie-wrap">
-            <div class="pie sm" style="background:conic-gradient(var(--warn) 0% 60%, var(--formule-1) 60% 90%, var(--ink-muted) 90% 100%);"></div>
-            <div class="legend">
-              <div class="lg"><span class="sw" style="background:var(--warn)"></span>Arrêt maladie — 60%</div>
-              <div class="lg"><span class="sw" style="background:var(--formule-1)"></span>Congés payés — 30%</div>
-              <div class="lg"><span class="sw" style="background:var(--ink-muted)"></span>Autre — 10%</div>
-            </div>
+            <div class="pie sm" id="tile-absences-pie-grh" style="background:conic-gradient(var(--ink-muted) 0% 100%);"></div>
+            <div class="legend" id="tile-absences-legend-grh"></div>
           </div>
         </div>
         <div class="tile">
@@ -1566,7 +1568,7 @@
           <div class="tile-trend">Lié au suivi « Poste à pourvoir &amp; candidats » ci-dessous</div>
         </div>
       </div>
-      <div class="assump">Sous-onglet GRH du module = vision agrégée depuis les fiches GRH interne (Onglet 7). Taux d'absentéisme = (jours d'absence / jours ouvrés théoriques) × 100. Donnée 100% fictive dans cet onglet, hors sections « congés provisoires » explicitement marquées réelles.</div>
+      <div class="assump">Sous-onglet GRH du module = vision agrégée depuis les fiches GRH interne (Onglet 7), recalculée en direct (GRH_IDENTITIES + grhOf()) — MAJ 11/11/2026 (demande Rémi). Taux d'absentéisme = (jours d'absence / jours ouvrés théoriques) × 100. Taux AT/AM reste non affiché, faute de module de déclaration dédié dans l'outil (voir tuile ci-dessus) — pas de donnée inventée pour le combler.</div>
 
       <div class="modheader" style="margin-top:18px;"><h2 class="mod-title" style="font-size:14px;">📊 Détail absences / CP par salarié<span class="k8-newtag">NEW</span></h2></div>
       <div class="mod-sub">Vue individuelle — arrêts maladie, congés payés pris/acquis, taux d'absentéisme par personne.</div>
@@ -1602,7 +1604,7 @@
           </select>
         </div>
         <div class="bar-list" id="cp-mois-chart"></div>
-        <div class="assump">Jan. → Sept. = réalisé (9 mois, donnée fictive). CP = congés payés, en jours ouvrés pris dans le mois.</div>
+        <div class="assump">Jan. → Sept. = réalisé (9 mois). Donnée réelle, calculée depuis les déclarations de CP de l'Onglet 7 GRH (voir kpiCpJoursParMoisReel) — le libellé « donnée fictive » ici était obsolète (corrigé le 11/11/2026, le calcul réel existait déjà depuis le 28/09/2026). CP = congés payés, en jours ouvrés pris dans le mois.</div>
       </div>
 
       <div class="card" style="margin-top:14px;">
@@ -1640,7 +1642,7 @@
           <tbody id="fr59-hist-body"></tbody>
           <tr class="total" id="fr59-hist-total"></tr>
         </table>
-        <div class="assump">Donnée réelle, non fictive. Le repère « 1 240 €/mois » (≈ 14 880 €/an) utilisé dans les tuiles ci-dessous et dans Projection FR reste, pour l'instant, un ancien placeholder fictif — l'écart avec le réel (≈ 400-500 €/mois) est significatif et mérite d'être corrigé avant toute décision basée sur ces projections.</div>
+        <div class="assump" id="fr59-recalibrage-note">Donnée réelle, non fictive. Le repère « 1 240 €/mois » (≈ 14 880 €/an) utilisé dans les tuiles ci-dessous et dans Projection FR reste, pour l'instant, un ancien placeholder fictif — écart confirmé avec le réel ci-dessus (moyenne réelle Janv.→Août 2026 : voir calcul en direct) — à recalibrer avec Rémi avant toute décision basée sur ces projections (changement de ratio financier volontairement laissé à sa validation, pas recalculé seul ici).</div>
       </div>
 
       <div class="card" style="margin-top:12px;border-color:#c97a1e;background:#fff7eb;">
@@ -1670,13 +1672,13 @@
         <div class="tile">
           <div class="tile-label">Répartition CA Groupe</div>
           <div class="pie-wrap">
-            <div class="pie sm" style="background:conic-gradient(var(--brand-navy) 0% 97%, var(--a59) 97% 100%);"></div>
-            <div class="legend">
+            <div class="pie sm" id="tile-cagroupe-pie" style="background:conic-gradient(var(--brand-navy) 0% 97%, var(--a59) 97% 100%);"></div>
+            <div class="legend" id="tile-cagroupe-legend">
               <div class="lg"><span class="sw" style="background:var(--brand-navy)"></span>Maison mère — 97%</div>
               <div class="lg"><span class="sw" style="background:var(--a59)"></span>APPA 59 — 3%</div>
             </div>
           </div>
-          <div class="tile-trend">Redevance uniquement, hors CA propre APPA 59 — donnée fictive, à recalibrer sur le réel ci-dessus</div>
+          <div class="tile-trend" id="tile-cagroupe-trend">Redevance uniquement, hors CA propre APPA 59 — donnée fictive, à recalibrer sur le réel ci-dessus</div>
         </div>
         <div class="tile">
           <div class="tile-label">Avancement — Développement</div>
@@ -3091,6 +3093,9 @@ let rlAgenceView = "59";
 let t3PersonneFilter = "";
 let t4PersonneFilter = "";
 let ssRevealed = {};
+// V39 (demande Rémi 12/11/2026) : état d'ouverture du formulaire "Changer de type (Heure ↔ Formule)"
+// par fiche client — même logique de bascule que editHost_${id} (voir toggleSwitchType ci-dessous).
+let switchTypeOpen = {};
 const _today0 = new Date();
 let calYear = _today0.getFullYear(), calMonth = _today0.getMonth();
 let calDayFilter = null;
@@ -3649,6 +3654,14 @@ async function boot(){
     GRH_REUNIONS_EQUIPE = (d && d.data()) ? d.data() : {};
     renderTab7();
   }, e=>console.warn("grhReunionsEquipe", e));
+
+  // MAJ 11/11/2026 (demande Rémi) : Onglet 7 — entretien individuel annuel (1 doc partagé unique, même
+  // principe que grhReunionsEquipe ci-dessus, clé "<CODE>-<ANNEE>").
+  db.collection("grhEntretiensAnnuels").onSnapshot(snap=>{
+    const d = snap.docs.find(x=>x.id==="entretiens");
+    GRH_ENTRETIENS_ANNUELS = (d && d.data()) ? d.data() : {};
+    renderTab7();
+  }, e=>console.warn("grhEntretiensAnnuels", e));
 
   // V33 (30/09/2026, demande Rémi, task 107) : Onglet 8 > Bénéfice > Étude CA vs Masse salariale —
   // Plan d'embauches pluriannuel + Frais annuels d'investissement pluriannuel. Même principe que
@@ -4581,6 +4594,7 @@ function renderTab8(){
   kpiRenderHistoriqueA1();
   kpiRenderMjpmReel();
   kpiRenderFr59Hist();
+  kpiRenderCaGroupeRatio();
   kpiRenderDroitEntree();
   kpiRenderRepartDyn();
   kpiRenderFrTargets();
@@ -4596,6 +4610,8 @@ function renderTab8(){
   kpiRenderFiches();
   kpiUpdatePgrhTotals();
   kpiRenderEcheanceContrat();
+  kpiRenderGrhStatsReelles();
+  kpiRenderVueEnsembleStatsReelles();
   kpiRenderKpiGrhDetail();
   kpiRenderGrhCongesReel();
   kpiRenderPostesAPourvoir();
@@ -5906,8 +5922,13 @@ function kpiOrgNodeHtml(e){
   html += '</div>';
   return html;
 }
-function kpiRenderOrganigramme(){
-  const wrap = document.getElementById('organigramme-wrap');
+function kpiRenderOrganigramme(targetId){
+  // MAJ 11/11/2026 (demande Rémi) : l'organigramme (généré depuis IDENTITIES, toujours à jour) doit aussi
+  // être présent et visible dans l'Onglet 7 GRH, pas seulement dans l'Onglet 8 KPI (réservé RE/ME) — Ala,
+  // qui a accès à l'Onglet 7 mais pas à l'Onglet 8, ne le voyait jamais. Même fonction, même donnée
+  // (KPI_ORG_CHART), juste un 2e conteneur cible possible — appelée une 2e fois depuis renderTab7() avec
+  // targetId='organigramme-wrap-grh'.
+  const wrap = document.getElementById(targetId || 'organigramme-wrap');
   if (!wrap) return;
   const p = KPI_ORG_CHART;
   let html = '<div class="org-box groupe">'+esc(p.groupeLabel)+'</div>';
@@ -5972,6 +5993,153 @@ function kpiRenderFiches(){
    }
   }).join('');
   grid.innerHTML = html;
+}
+
+/* ---------- Vue d'ensemble — tuiles portefeuille clients (module KPI) ---------- */
+// MAJ 11/11/2026 (demande Rémi, QCM confirmé) — "Clients par statut" et "Évolution nombre de clients"
+// avaient des chiffres en dur marqués "donnée fictive" alors qu'un vrai équivalent existe déjà (tableau
+// `clients` + champ createdAt, déjà utilisé partout ailleurs — réutilise statutBreakdown()/STATUT_META/
+// PIE_STATUT_COLORS, déjà définis plus bas dans ce fichier pour l'Onglet 1). "Taux de transformation
+// Prospect→Client" reste hors scope : aucun historique de changement de statut n'est tracé aujourd'hui
+// (seul le statut ACTUEL est connu), donc pas de vrai équivalent — laissé tel quel (voir tuile HTML).
+function kpiRenderVueEnsembleStatsReelles(){
+  const pieEl = document.getElementById('tile-clientstatut-pie'), legEl = document.getElementById('tile-clientstatut-legend');
+  if (pieEl && legEl && typeof statutBreakdown === 'function'){
+    const parts = statutBreakdown(clients).filter(p=>p.value>0);
+    const total = parts.reduce((s,p)=>s+p.value,0);
+    if (total<=0){ pieEl.style.background = 'conic-gradient(var(--ink-muted) 0% 100%)'; legEl.innerHTML = `<div class="lg" style="color:var(--ink-muted)">Aucun client</div>`; }
+    else {
+      let acc = 0, segs = [];
+      parts.forEach(p=>{ const pct = p.value/total*100; segs.push(`${p.color} ${acc}% ${acc+pct}%`); acc += pct; });
+      pieEl.style.background = `conic-gradient(${segs.join(', ')})`;
+      legEl.innerHTML = parts.map(p=>`<div class="lg"><span class="sw" style="background:${p.color}"></span>${esc(p.label)} — ${Math.round(p.value/total*100)}% (${p.value})</div>`).join("");
+    }
+  }
+  const evolEl = document.getElementById('tile-evolclients-value'), evolTrend = document.getElementById('tile-evolclients-trend');
+  if (evolEl){
+    const seuil = new Date(); seuil.setMonth(seuil.getMonth()-6);
+    const avecDate = clients.filter(c=>c.createdAt);
+    const nbRecents = avecDate.filter(c=> new Date(c.createdAt) >= seuil).length;
+    evolEl.innerHTML = `+${nbRecents} <small>sur 6 mois</small>`;
+    if (evolTrend) evolTrend.textContent = avecDate.length < clients.length
+      ? `Donnée réelle (sur ${avecDate.length}/${clients.length} dossiers avec date de création renseignée)`
+      : `Donnée réelle — nouveaux dossiers créés (champ createdAt) sur les 6 derniers mois`;
+  }
+}
+
+/* ---------- GRH — tuiles agrégées (module KPI, sous-onglet GRH) ---------- */
+// MAJ 11/11/2026 (demande Rémi, QCM confirmé "remplacer seulement ce qui a un vrai équivalent") — ce bloc
+// de tuiles (effectif, répartition contrat, ancienneté, absentéisme, présence, arrêts maladie, CP, pie
+// répartition absences) était entièrement en dur dans le HTML, marqué "donnée fictive". Recalculé ici en
+// LIVE depuis GRH_IDENTITIES + grhOf() (Onglet 7, source unique déjà utilisée pour les absences — jamais
+// une ressaisie séparée, même principe que kpiRenderKpiGrhDetail ci-dessous). Le taux AT/AM reste affiché
+// "non suivi" (pas de module de déclaration d'accident dans l'outil) — jamais un 0% inventé. Les
+// simulateurs de projection (Projection FR, Bénéfice théorique, cibles de développement) restent
+// INCHANGÉS : ce sont des hypothèses éditables par nature, pas des "données fictives" au sens propre
+// (confirmé par Rémi — hors scope de cette MAJ).
+const KPI_GRH_TYPE_CONTRAT_LABEL = { CDI:'CDI', CDD:'CDD', APPRENTISSAGE:'Apprentissage', STAGE:'Stage', GERANT_TNS:'Gérant (TNS)' };
+function kpiGrhJoursAbsenceReels(a, annee){
+  // Jours ouvrés (hors week-end + jours fériés FR) de CETTE absence, bornés à l'année demandée — réutilise
+  // grhHeuresAbsenceBornes (existant, Onglet 7) plutôt qu'une 2e logique de bornage.
+  if (!a.dateDebut) return 0;
+  const {start, endExclusive} = grhHeuresAbsenceBornes(a);
+  const anneeDebut = new Date(annee,0,1), anneeFinExclusive = new Date(annee+1,0,1);
+  const from = start > anneeDebut ? start : anneeDebut;
+  const to = endExclusive < anneeFinExclusive ? endExclusive : anneeFinExclusive;
+  if (from>=to) return 0;
+  let n = 0;
+  for (let d=new Date(from); d<to; d.setDate(d.getDate()+1)){
+    const dow = d.getDay();
+    if (dow===0 || dow===6) continue;
+    if (estJourFerieFR(d)) continue;
+    n++;
+  }
+  return n;
+}
+function kpiGrhJoursOuvresAnneeAce(annee){
+  const now = new Date();
+  const finRef = (annee===now.getFullYear()) ? now : new Date(annee,11,31);
+  let n = 0;
+  for (let d=new Date(annee,0,1); d<=finRef; d.setDate(d.getDate()+1)){
+    const dow = d.getDay();
+    if (dow===0 || dow===6) continue;
+    if (estJourFerieFR(d)) continue;
+    n++;
+  }
+  return n;
+}
+function kpiGrhStatsReelles(){
+  const annee = new Date().getFullYear();
+  const joursOuvresEcoules = kpiGrhJoursOuvresAnneeAce(annee);
+  let anciennetesAns = [], contratCounts = {};
+  let joursMaladie=0, nbArretsMaladie=0, salariesMaladie=new Set();
+  let joursCp=0, soldeRestant=[];
+  GRH_IDENTITIES.forEach(code=>{
+    const g = grhOf(code);
+    const typeC = g.typeContrat || "CDI";
+    contratCounts[typeC] = (contratCounts[typeC]||0)+1;
+    const dEmbauche = g.dateEmbauche ? dateToJs(g.dateEmbauche) : null;
+    if (dEmbauche) anciennetesAns.push((new Date()-dEmbauche)/(365.25*24*3600*1000));
+    if (typeC!=="GERANT_TNS" && g.soldeCP) soldeRestant.push(g.soldeCP.nEnCours||0);
+    (g.absences||[]).forEach(a=>{
+      if (a.type!=="CP" && a.type!=="MALADIE") return;
+      const j = kpiGrhJoursAbsenceReels(a, annee);
+      if (!j) return;
+      if (a.type==="MALADIE"){ joursMaladie+=j; nbArretsMaladie++; salariesMaladie.add(code); }
+      else { joursCp+=j; }
+    });
+  });
+  const effectif = GRH_IDENTITIES.length;
+  const joursOuvresEquipe = joursOuvresEcoules * effectif;
+  const tauxAbsenteisme = joursOuvresEquipe>0 ? ((joursMaladie+joursCp)/joursOuvresEquipe*100) : null;
+  return {
+    effectif, contratCounts,
+    ancienneteMoyenne: anciennetesAns.length ? anciennetesAns.reduce((s,x)=>s+x,0)/anciennetesAns.length : null,
+    ancienneteRenseignees: anciennetesAns.length,
+    joursMaladie, nbArretsMaladie, nbSalariesMaladie: salariesMaladie.size,
+    joursCp, soldeRestantMoyen: soldeRestant.length ? soldeRestant.reduce((s,x)=>s+x,0)/soldeRestant.length : null,
+    tauxAbsenteisme
+  };
+}
+function kpiGrhPieHTML(pieId, legendId, parts /* [{label, value, color}] */){
+  const total = parts.reduce((s,p)=>s+p.value,0);
+  const pieEl = document.getElementById(pieId), legEl = document.getElementById(legendId);
+  if (!pieEl || !legEl) return;
+  if (total<=0){ pieEl.style.background = 'conic-gradient(var(--ink-muted) 0% 100%)'; legEl.innerHTML = `<div class="lg" style="color:var(--ink-muted)">Aucune donnée pour l'instant</div>`; return; }
+  let acc = 0, segs = [];
+  parts.forEach(p=>{
+    const pct = p.value/total*100;
+    segs.push(`${p.color} ${acc}% ${acc+pct}%`);
+    acc += pct;
+  });
+  pieEl.style.background = `conic-gradient(${segs.join(', ')})`;
+  legEl.innerHTML = parts.map(p=>`<div class="lg"><span class="sw" style="background:${p.color}"></span>${esc(p.label)} — ${Math.round(p.value/total*100)}% (${p.value})</div>`).join("");
+}
+function kpiRenderGrhStatsReelles(){
+  const s = kpiGrhStatsReelles();
+  const effEl = document.getElementById('tile-effectif-grh-value'), effSmall = document.getElementById('tile-effectif-grh-small');
+  if (effEl) effEl.childNodes[0].nodeValue = String(s.effectif)+' ';
+  if (effSmall) effSmall.textContent = GRH_IDENTITIES.map(c=>grhLabel(c)).join(', ');
+  kpiGrhPieHTML('tile-contrat-grh-pie', 'tile-contrat-grh-legend',
+    Object.entries(s.contratCounts).map(([t,n],i)=>({label:KPI_GRH_TYPE_CONTRAT_LABEL[t]||t, value:n, color:['var(--brand-navy)','var(--formule-1)','var(--formule-2)','var(--formule-3)','var(--ink-muted)'][i%5]})));
+  const ancEl = document.getElementById('tile-anciennete-grh-value'), ancTrend = document.getElementById('tile-anciennete-grh-trend');
+  if (ancEl) ancEl.innerHTML = s.ancienneteMoyenne!=null ? `${(Math.round(s.ancienneteMoyenne*10)/10).toLocaleString('fr-FR')} <small>an</small>` : `— <small>non renseignée</small>`;
+  if (ancTrend) ancTrend.textContent = s.ancienneteRenseignees < GRH_IDENTITIES.length
+    ? `Calculée depuis dateEmbauche — renseignée pour ${s.ancienneteRenseignees}/${GRH_IDENTITIES.length} fiches GRH (Onglet 7)`
+    : `Calculée depuis dateEmbauche des ${GRH_IDENTITIES.length} fiches GRH (Onglet 7) — donnée réelle`;
+  const absEl = document.getElementById('tile-absenteisme-grh-value'), presEl = document.getElementById('tile-presence-grh-value');
+  if (absEl) absEl.innerHTML = s.tauxAbsenteisme!=null ? `${(Math.round(s.tauxAbsenteisme*10)/10).toLocaleString('fr-FR')}% <small>toutes causes</small>` : `— <small>n/d</small>`;
+  if (presEl) presEl.innerHTML = s.tauxAbsenteisme!=null ? `${(Math.round((100-s.tauxAbsenteisme)*10)/10).toLocaleString('fr-FR')}% <small>toutes causes</small>` : `— <small>n/d</small>`;
+  const arrEl = document.getElementById('tile-arretsmaladie-grh-value'), arrTrend = document.getElementById('tile-arretsmaladie-grh-trend');
+  if (arrEl) arrEl.innerHTML = `${s.nbArretsMaladie} <small>arrêt${s.nbArretsMaladie>1?'s':''} · ${Math.round(s.joursMaladie)} j cumulés</small>`;
+  if (arrTrend) arrTrend.textContent = s.nbArretsMaladie ? `${s.nbSalariesMaladie} salarié(s) concerné(s) sur ${GRH_IDENTITIES.length} — donnée réelle` : `Aucun arrêt maladie déclaré sur ${new Date().getFullYear()} — donnée réelle`;
+  const cpEl = document.getElementById('tile-cp-grh-value'), cpTrend = document.getElementById('tile-cp-grh-trend');
+  if (cpEl) cpEl.innerHTML = `${Math.round(s.joursCp)} <small>j pris</small> / ${s.soldeRestantMoyen!=null?(Math.round(s.soldeRestantMoyen*10)/10).toLocaleString('fr-FR'):'—'} <small>j solde moy./salarié</small>`;
+  if (cpTrend) cpTrend.textContent = `Jours CP pris en ${new Date().getFullYear()} (toute l'équipe) + solde moyen restant — donnée réelle (fiches GRH)`;
+  kpiGrhPieHTML('tile-absences-pie-grh', 'tile-absences-legend-grh', [
+    {label:'Arrêt maladie', value:Math.round(s.joursMaladie), color:'var(--warn)'},
+    {label:'Congés payés', value:Math.round(s.joursCp), color:'var(--formule-1)'}
+  ]);
 }
 
 /* ---------- GRH — statistiques absences / CP détaillées (module KPI) ---------- */
@@ -6949,6 +7117,45 @@ function kpiRenderFr59Hist(){
   const totalTtc = KPI_FR59_HIST_TTC.reduce((a,b)=>a+b,0);
   const totalFact = KPI_FR59_HIST_NBFACT.reduce((a,b)=>a+b,0);
   document.getElementById('fr59-hist-total').innerHTML = '<td>TOTAL Janv.→Août 2026</td><td>'+totalFact+'</td><td>'+kpiFmtEurCents(totalTtc)+'</td>';
+  // MAJ 11/11/2026 (demande Rémi) : affiche la vraie moyenne mensuelle calculée (au lieu du texte vague
+  // "≈ 400-500 €/mois"). Le ratio de la tuile "Répartition CA Groupe" est désormais recalculé sur le réel
+  // par kpiRenderCaGroupeRatio() (MAJ 12/11/2026, QCM confirmé — ce n'est plus laissé à 97%/3% fictif).
+  const note = document.getElementById('fr59-recalibrage-note');
+  if (note){
+    const moyenneReelle = totalTtc / KPI_FR59_HIST_MOIS.length;
+    note.innerHTML = note.innerHTML.replace('voir calcul en direct', kpiFmtEurCents(moyenneReelle)+'/mois');
+  }
+}
+// MAJ 12/11/2026 (demande Rémi, QCM confirmé) : recalibrage du ratio "Répartition CA Groupe" (jusqu'ici
+// fictif 97%/3%) sur les vraies données déjà saisies dans KPI_REPORTING_CA_MENSUEL — même source que le
+// Reporting CA mensuel officiel (caHeure+caFormule = CA propre Maison mère ; franchise = redevance perçue
+// d'APPA 59). Définition confirmée par Rémi : "CA Groupe" = CA Maison mère uniquement, la redevance en
+// faisant partie (c'est un revenu encaissé par la Maison mère). S'étend automatiquement à chaque nouveau
+// mois saisi via le Reporting CA — aucune valeur figée, aucun nouveau champ de saisie à créer.
+function kpiRenderCaGroupeRatio(){
+  const pieEl = document.getElementById('tile-cagroupe-pie');
+  const legEl = document.getElementById('tile-cagroupe-legend');
+  const trendEl = document.getElementById('tile-cagroupe-trend');
+  if (!pieEl || !legEl || !trendEl) return;
+  const moisKeys = Object.keys(KPI_REPORTING_CA_MENSUEL).sort();
+  if (!moisKeys.length){ trendEl.textContent = '⚪ Aucune donnée de Reporting CA saisie pour l\'instant.'; return; }
+  let totalMaison = 0, totalRedevance = 0;
+  moisKeys.forEach(k=>{
+    const r = KPI_REPORTING_CA_MENSUEL[k];
+    totalMaison += (r.caHeure||0)+(r.caFormule||0);
+    totalRedevance += (r.franchise||0);
+  });
+  const totalGroupe = totalMaison + totalRedevance;
+  if (totalGroupe<=0){ trendEl.textContent = '⚪ Aucune donnée exploitable pour l\'instant.'; return; }
+  const pctMaison = totalMaison/totalGroupe*100;
+  const pctRedevance = totalRedevance/totalGroupe*100;
+  pieEl.style.background = `conic-gradient(var(--brand-navy) 0% ${pctMaison.toFixed(1)}%, var(--a59) ${pctMaison.toFixed(1)}% 100%)`;
+  legEl.innerHTML = `
+    <div class="lg"><span class="sw" style="background:var(--brand-navy)"></span>Maison mère — ${pctMaison.toFixed(1)}%</div>
+    <div class="lg"><span class="sw" style="background:var(--a59)"></span>APPA 59 (redevance) — ${pctRedevance.toFixed(1)}%</div>`;
+  const premier = moisKeys[0], dernier = moisKeys[moisKeys.length-1];
+  const labelPremier = KPI_RCA_MOIS_LABELS[premier]||premier, labelDernier = KPI_RCA_MOIS_LABELS[dernier]||dernier;
+  trendEl.innerHTML = `🟢 Réel — redevance (${kpiFmtEur(totalRedevance)}) incluse dans le CA Maison mère (${kpiFmtEur(totalGroupe)} au total), sur ${moisKeys.length} mois de Reporting CA saisi(s) (${esc(labelPremier)} → ${esc(labelDernier)}).`;
 }
 const KPI_DROIT_ENTREE_TOTAL_59 = 30000;
 function kpiDroitEntreeTotalPaye(){
@@ -7499,7 +7706,54 @@ const MAILING_TEMPLATES = [
       const arrivee = v.LIEU_ARRIVEE || "[lieu d'arrivée à préciser]";
       const motif = v.MOTIF_TRANSPORT ? ` (${v.MOTIF_TRANSPORT})` : "";
       return { objet: `Réservation VSL/AMBU — ${date}`,
-        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nNous souhaiterions réserver un transport sanitaire (VSL/AMBU) le ${date}${heure}, de ${depart} vers ${arrivee}${motif}.\n\nPourriez-vous nous confirmer votre disponibilité ainsi que les modalités de prise en charge ?\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } }
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nNous souhaiterions réserver un transport sanitaire (VSL/AMBU) le ${date}${heure}, de ${depart} vers ${arrivee}${motif}.\n\nPourriez-vous nous confirmer votre disponibilité ainsi que les modalités de prise en charge ?\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } },
+  // MAJ 11/11/2026 (demande Rémi, MAJ novembre 2026) — 5 nouveaux sujets, même architecture que les
+  // modèles existants (champs + build(rec,v,redacteur) → {objet, corps}), ajoutés dans les catégories
+  // déjà existantes (aucune nouvelle catégorie créée).
+  { id:"rediger_tache", icon:"📝", titre:"Rédiger une tâche", categorie:"SUIVI",
+    champs:[{key:"SUJET_TACHE", label:"Sujet / contexte de la tâche à rédiger", placeholder:"ex : dépôt du dossier APA à transmettre par écrit"}],
+    build(rec, v, redacteur){
+      const sujet = v.SUJET_TACHE || "[sujet à préciser]";
+      return { objet: "Confirmation écrite nécessaire — suivi de tâche",
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nAfin de créer le suivi correspondant dans notre système, pourriez-vous nous confirmer par écrit (mail de retour) l'élément suivant : ${sujet} ?\n\nCela nous permettra d'assurer un suivi précis de cette démarche.\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } },
+  // Distinct de "Réserver un VSL/AMBU" (qui s'adresse au transporteur pour DEMANDER une réservation) :
+  // celui-ci s'adresse au bénéficiaire/MJPM/famille pour les INFORMER qu'un transport est déjà planifié.
+  { id:"informer_planification_vsl", icon:"🚑", titre:"Informer planification d'un VSL/AMBU", categorie:"TRANSPORT",
+    champs:[
+      {key:"DATE_TRANSPORT", label:"Date du transport", placeholder:"ex : 12/10/2026"},
+      {key:"HEURE_TRANSPORT", label:"Heure de prise en charge", placeholder:"ex : 9h00"},
+      {key:"LIEU_DEPART", label:"Lieu de départ", placeholder:"ex : domicile du bénéficiaire, 12 rue des Lilas"},
+      {key:"LIEU_ARRIVEE", label:"Lieu d'arrivée", placeholder:"ex : hôpital / cabinet médical"},
+      {key:"MOTIF_TRANSPORT", label:"Motif du transport (optionnel)", placeholder:"ex : consultation cardiologue"}
+    ],
+    build(rec, v, redacteur){
+      const date = v.DATE_TRANSPORT || "[date à compléter]";
+      const heure = v.HEURE_TRANSPORT ? ` à ${v.HEURE_TRANSPORT}` : "";
+      const depart = v.LIEU_DEPART || "[lieu de départ à préciser]";
+      const arrivee = v.LIEU_ARRIVEE || "[lieu d'arrivée à préciser]";
+      const motif = v.MOTIF_TRANSPORT ? ` (${v.MOTIF_TRANSPORT})` : "";
+      return { objet: `Transport VSL/AMBU planifié — ${date}`,
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nNous vous informons qu'un transport sanitaire (VSL/AMBU) est planifié le ${date}${heure}, de ${depart} vers ${arrivee}${motif}.\n\nMerci de vous tenir prêt(e) à l'heure indiquée. En cas d'empêchement, merci de nous prévenir au plus vite.\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } },
+  { id:"transmission_contrat_signature_pj", icon:"✍️", titre:"Transmission contrat pour signature avec demande des PJ", categorie:"PIECES",
+    champs:[{key:"PIECES_DEMANDEES", label:"Pièces jointes à demander (selon le type de contrat)", placeholder:"ex : CNI, RIB, justificatif de domicile..."}],
+    build(rec, v, redacteur){
+      const pieces = v.PIECES_DEMANDEES || "[pièces à préciser selon le contrat]";
+      return { objet: "Contrat à signer — pièces à nous retourner",
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nVeuillez trouver ci-joint le contrat à signer.\n\nAfin de finaliser votre dossier, merci de nous retourner, en plus du contrat signé, les pièces suivantes : ${pieces}.\n\nNous restons à votre disposition pour toute question.\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } },
+  { id:"transmission_contrat_finalise", icon:"✅", titre:"Transmission contrat 100% finalisé", categorie:"PIECES", champs:[],
+    build(rec, v, redacteur){
+      return { objet: "Votre contrat finalisé et signé",
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nVeuillez trouver ci-joint votre contrat 100% finalisé et signé.\n\nNous restons à votre disposition pour toute question.\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } },
+  { id:"transmission_devis", icon:"📄", titre:"Transmission de devis", categorie:"FACTURATION",
+    champs:[
+      {key:"DEVIS_REF", label:"Référence devis", placeholder:"ex : devis n°2026-0123 du 05/11"},
+      {key:"MONTANT_DEVIS", label:"Montant (optionnel)", placeholder:"ex : 450,00 € TTC"}
+    ],
+    build(rec, v, redacteur){
+      const ref = v.DEVIS_REF ? ` — ${v.DEVIS_REF}` : "";
+      const montant = v.MONTANT_DEVIS ? ` (montant : ${v.MONTANT_DEVIS})` : "";
+      return { objet: `Votre devis APPA Services${ref}`,
+        corps: `Bonjour ${rec.prenom||"Madame, Monsieur"},\n\nVeuillez trouver ci-joint votre devis APPA Services${ref}${montant}.\n\nN'hésitez pas à revenir vers nous pour toute question ou pour validation.\n\nBien cordialement,\n${redacteur}\nAPPA Services` }; } }
 ];
 let mailingSelectedCategorie = null;
 let mailingSelectedId = null;
@@ -8005,45 +8259,192 @@ async function grhPersistReunionsEquipe(){
   try{ await db.doc('grhReunionsEquipe/reunions').update(GRH_REUNIONS_EQUIPE); }
   catch(e){ console.warn('grhReunionsEquipe persist', e); }
 }
+// MAJ 11/11/2026 (demande Rémi, refonte complète — QCM confirmé) : (1) sujets postés librement par TOUTE
+// l'équipe (GRH_IDENTITIES, pas seulement RE/ME/Ala), (2) date fixée automatiquement au 1er lundi de
+// chaque mois (surchargeable par RE/ME si besoin, ex. jour férié), confirmée explicitement par RE/ME,
+// (3) bandeau d'alerte si pas confirmée à J-7. Même doc partagé grhReunionsEquipe/reunions, nouveaux champs
+// (dateOverride/confirmee/sujets) à côté de l'ancien compteRendu (conservé tel quel).
+function grhReunionDateAutoISO(cle){
+  const [y,m] = cle.split('-').map(Number);
+  const d = new Date(y, m-1, 1);
+  const dow = d.getDay(); // 0=dimanche
+  const offset = dow===0 ? 1 : (dow===1 ? 0 : 8-dow);
+  d.setDate(d.getDate()+offset);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function grhReunionEntry(cle){ return GRH_REUNIONS_EQUIPE[cle] || { dateOverride:null, confirmee:false, compteRendu:'', sujets:[] }; }
+function grhReunionDateEffectiveFR(cle){
+  const entry = grhReunionEntry(cle);
+  return entry.dateOverride || fmtDateFR(grhReunionDateAutoISO(cle));
+}
+function grhReunionAlerteInfo(cle){
+  const entry = grhReunionEntry(cle);
+  if (entry.confirmee) return null;
+  const d = dateToJs(grhReunionDateEffectiveFR(cle));
+  if (!d) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d0 = new Date(d); d0.setHours(0,0,0,0);
+  const diff = Math.round((d0-now)/(1000*60*60*24));
+  if (diff > 7) return null;
+  if (diff < 0) return { level:'urgent', text:`⚠️ Réunion de ${grhReunionMoisLabel(cle)} non confirmée — date prévue (${grhReunionDateEffectiveFR(cle)}) déjà dépassée` };
+  return { level: diff<=3?'urgent':'vigilance', text:`⚠️ Réunion de ${grhReunionMoisLabel(cle)} pas encore confirmée — prévue le ${grhReunionDateEffectiveFR(cle)} (J-${diff})` };
+}
 function grhEnregistrerReunion(){
   const cle = grhReunionSelectedMonth || grhMoisCourantCle();
-  const dateEl = document.getElementById('grh-reunion-date');
+  const dateOverrideEl = document.getElementById('grh-reunion-date');
   const crEl = document.getElementById('grh-reunion-cr');
-  const date = (dateEl ? dateEl.value : '').trim();
+  const confirmeeEl = document.getElementById('grh-reunion-confirmee');
+  const dateOverride = (dateOverrideEl ? dateOverrideEl.value : '').trim();
   const compteRendu = (crEl ? crEl.value : '').trim();
-  if (!date && !compteRendu){ toast("⚠️ Renseignez au moins une date ou un compte-rendu avant d'enregistrer."); return; }
-  GRH_REUNIONS_EQUIPE[cle] = { datePlanifiee: date, compteRendu, updatedAt: new Date().toISOString(), updatedBy: identity };
+  const confirmee = confirmeeEl ? !!confirmeeEl.checked : false;
+  const entry = grhReunionEntry(cle);
+  GRH_REUNIONS_EQUIPE[cle] = { ...entry, dateOverride: dateOverride||null, confirmee, compteRendu, updatedAt: new Date().toISOString(), updatedBy: identity };
   toast('✅ Réunion de '+grhReunionMoisLabel(cle)+' enregistrée.');
   renderTab7();
   grhPersistReunionsEquipe();
 }
+// Sujets proposés — ouvert à TOUTE l'équipe (pas seulement RE/ME/Ala), utilisable depuis la carte équipe
+// complète ET depuis la mini-carte affichée sur la fiche individuelle (voir grhRenderReunionMini ci-dessous).
+function grhReunionPosterSujet(cle){
+  const ta = document.getElementById(`grh-reunion-sujet-${cle}`);
+  const text = (ta ? ta.value : '').trim();
+  if (!text) return;
+  const entry = grhReunionEntry(cle);
+  const sujets = [...(entry.sujets||[]), {who: identity, text, when: new Date().toISOString()}];
+  GRH_REUNIONS_EQUIPE[cle] = { ...entry, sujets, updatedAt: new Date().toISOString(), updatedBy: identity };
+  toast('✅ Sujet ajouté pour '+grhReunionMoisLabel(cle));
+  renderTab7();
+  grhPersistReunionsEquipe();
+}
+function grhReunionSujetsListHTML(cle){
+  const sujets = grhReunionEntry(cle).sujets||[];
+  if (!sujets.length) return `<div class="demo-label" style="margin:6px 0">Aucun sujet proposé pour l'instant.</div>`;
+  return `<div style="display:flex;flex-direction:column;gap:4px;margin:6px 0">${sujets.map(s=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:11.5px"><span style="flex-shrink:0">${personAvatar(s.who,18)}</span><span><b>${esc(grhLabel(s.who)||s.who)}</b> — ${esc(s.text)}</span></div>`).join("")}</div>`;
+}
+function grhReunionPosterSujetHTML(cle){
+  return `<div class="field" style="margin-top:6px">
+    <span class="lbl" style="text-transform:none;letter-spacing:0">Proposer un sujet pour la prochaine réunion</span>
+    <textarea id="grh-reunion-sujet-${esc(cle)}" rows="2" placeholder="Votre sujet à aborder..."></textarea>
+    <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="grhReunionPosterSujet('${esc(cle)}')">➕ Proposer ce sujet</button>
+  </div>`;
+}
 function grhRenderReunionsEquipeCard(){
   const cle = grhReunionSelectedMonth || grhMoisCourantCle();
-  const entry = GRH_REUNIONS_EQUIPE[cle] || { datePlanifiee:'', compteRendu:'' };
+  const entry = grhReunionEntry(cle);
   const moisDisponibles = new Set(Object.keys(GRH_REUNIONS_EQUIPE));
   moisDisponibles.add(grhMoisCourantCle());
   moisDisponibles.add(cle);
   const moisTries = Array.from(moisDisponibles).sort().reverse();
   const historique = Object.keys(GRH_REUNIONS_EQUIPE).filter(k=>k!==cle).sort().reverse();
+  const alerte = grhReunionAlerteInfo(cle);
   return `<div class="repartition-panel" style="margin-top:14px">
     <div class="repartition-panel-title">📅 Réunion d'équipe mensuelle<span class="k8-newtag">NEW</span></div>
+    ${alerte ? `<div class="badge outline" style="display:block;margin-bottom:8px;border-color:${alerte.level==='urgent'?'var(--crit-haute)':'var(--status-enattente)'};color:${alerte.level==='urgent'?'#a3231c':'#8a5c04'}">${esc(alerte.text)}</div>` : ""}
     <div class="field-grid">
       <div class="field"><span class="lbl">Mois</span>
         <select onchange="grhSetReunionMois(this.value)">
           ${moisTries.map(k=>`<option value="${esc(k)}" ${k===cle?"selected":""}>${esc(grhReunionMoisLabel(k))}</option>`).join("")}
         </select>
       </div>
-      <div class="field"><span class="lbl" style="text-transform:none;letter-spacing:0">Date planifiée</span><input id="grh-reunion-date" placeholder="JJ/MM/AAAA" value="${esc(entry.datePlanifiee||"")}"></div>
+      <div class="field"><span class="lbl" style="text-transform:none;letter-spacing:0">Date (auto = 1er lundi du mois — surchargeable)</span><input id="grh-reunion-date" placeholder="${esc(fmtDateFR(grhReunionDateAutoISO(cle)))}" value="${esc(entry.dateOverride||"")}"></div>
+      <div class="field"><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;margin-top:18px"><input type="checkbox" id="grh-reunion-confirmee" ${entry.confirmee?"checked":""}> Date confirmée</label></div>
     </div>
+    <div class="demo-label" style="margin:4px 0">Date retenue pour ${esc(grhReunionMoisLabel(cle))} : <b>${esc(grhReunionDateEffectiveFR(cle))}</b>${entry.confirmee?" ✅ confirmée":" — à confirmer"}</div>
     <div class="field" style="margin-top:8px"><span class="lbl">Compte-rendu</span>
       <textarea id="grh-reunion-cr" rows="4" placeholder="Points abordés, décisions, actions à suivre...">${esc(entry.compteRendu||"")}</textarea>
     </div>
     <button class="btn btn-primary1 btn-sm" style="margin-top:8px" onclick="grhEnregistrerReunion()">💾 Enregistrer</button>
     ${entry.updatedAt ? `<div class="demo-label" style="margin-top:6px">Dernière modification : ${new Date(entry.updatedAt).toLocaleString('fr-FR')} par ${esc(grhLabel(entry.updatedBy)||entry.updatedBy||"—")}</div>` : ""}
+    <div class="repartition-panel-title" style="margin-top:12px;font-size:12px">💡 Sujets proposés par l'équipe</div>
+    ${grhReunionSujetsListHTML(cle)}
+    ${grhReunionPosterSujetHTML(cle)}
     ${historique.length ? `<div style="font-size:11.5px;margin-top:10px">${historique.map(k=>{
         const h = GRH_REUNIONS_EQUIPE[k];
         const resume = h.compteRendu ? (h.compteRendu.length>80 ? h.compteRendu.slice(0,80)+"…" : h.compteRendu) : "";
-        return "↳ <b>"+esc(grhReunionMoisLabel(k))+"</b> — "+(h.datePlanifiee?("planifiée le "+esc(h.datePlanifiee)):"date non renseignée")+(resume?(" — "+esc(resume)):"");
+        const dateH = h.dateOverride || fmtDateFR(grhReunionDateAutoISO(k));
+        return "↳ <b>"+esc(grhReunionMoisLabel(k))+"</b> — "+(dateH?("date : "+esc(dateH)):"date non renseignée")+(resume?(" — "+esc(resume)):"");
+      }).join("<br>")}</div>` : ""}
+  </div>`;
+}
+// Mini-carte affichée sur la fiche INDIVIDUELLE (CG/II — Cindy/Hinda, qui n'ont pas accès à la vue équipe
+// complète) : permet de proposer un sujet sans exposer la gestion de date/confirmation/compte-rendu
+// (réservée à RE/ME/Ala via la carte complète ci-dessus, dans la vue équipe de renderTab7).
+function grhRenderReunionMini(){
+  const cle = grhMoisCourantCle();
+  const entry = grhReunionEntry(cle);
+  const alerte = grhReunionAlerteInfo(cle);
+  return `<div class="repartition-panel" style="margin-top:14px">
+    <div class="repartition-panel-title">📅 Réunion d'équipe mensuelle — ${esc(grhReunionMoisLabel(cle))}</div>
+    ${alerte ? `<div class="badge outline" style="display:block;margin-bottom:8px;border-color:${alerte.level==='urgent'?'var(--crit-haute)':'var(--status-enattente)'};color:${alerte.level==='urgent'?'#a3231c':'#8a5c04'}">${esc(alerte.text)}</div>` : ""}
+    <div class="demo-label" style="margin:4px 0">Date prévue : <b>${esc(grhReunionDateEffectiveFR(cle))}</b>${entry.confirmee?" ✅ confirmée":" — en attente de confirmation par Rémi/Mélissa"}</div>
+    <div class="repartition-panel-title" style="margin-top:10px;font-size:12px">💡 Sujets déjà proposés</div>
+    ${grhReunionSujetsListHTML(cle)}
+    ${grhReunionPosterSujetHTML(cle)}
+  </div>`;
+}
+
+// ================= Entretien individuel annuel (demande Rémi 11/11/2026 — QCM confirmé) =================
+// Même mécanique que la réunion d'équipe mensuelle ci-dessus, mais PAR SALARIÉ et PAR AN : 1 doc partagé
+// grhEntretiensAnnuels/entretiens, clé "<CODE>-<ANNEE>" (ex. "RE-2027"). RE/ME fixent la date (en janvier)
+// + cochent "communiquée" ; alerte vigilance/urgente si pas communiquée à l'approche de fin janvier ou si
+// dépassée. Volontairement SANS champ compte-rendu (scope confirmé par Rémi, contrairement à la réunion
+// d'équipe qui en a un). Carte affichée sur CHAQUE fiche individuelle (Onglet 7) — éditable par RE/ME,
+// lecture seule pour le salarié concerné (et pour Ala, qui reste en lecture seule sur RE/ME comme ailleurs).
+let GRH_ENTRETIENS_ANNUELS = {};
+function grhEntretienAnneeCourante(){ return new Date().getFullYear(); }
+function grhEntretienCle(code, annee){ return `${code}-${annee}`; }
+function grhEntretienEntry(code, annee){ return GRH_ENTRETIENS_ANNUELS[grhEntretienCle(code,annee)] || { date:null, communique:false }; }
+async function grhPersistEntretiensAnnuels(){
+  if (!db) return;
+  try{ await db.doc('grhEntretiensAnnuels/entretiens').update(GRH_ENTRETIENS_ANNUELS); }
+  catch(e){ console.warn('grhEntretiensAnnuels persist', e); }
+}
+function grhEntretienAlerteInfo(code, annee){
+  const entry = grhEntretienEntry(code, annee);
+  if (entry.communique) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const finJanvier = new Date(annee, 0, 31); finJanvier.setHours(0,0,0,0);
+  const diff = Math.round((finJanvier-now)/(1000*60*60*24));
+  if (diff > 30) return null;
+  if (diff < 0) return { level:'urgent', text:`⚠️ Entretien individuel annuel ${annee} non communiqué — fin janvier déjà dépassée` };
+  return { level: diff<=10 ? 'urgent':'vigilance', text:`⚠️ Entretien individuel annuel ${annee} pas encore fixé/communiqué — J-${diff} avant fin janvier` };
+}
+function grhEnregistrerEntretien(code){
+  const annee = grhEntretienAnneeCourante();
+  const dateEl = document.getElementById(`grh-entretien-date-${code}`);
+  const communiqueEl = document.getElementById(`grh-entretien-communique-${code}`);
+  const date = (dateEl ? dateEl.value : '').trim();
+  const communique = communiqueEl ? !!communiqueEl.checked : false;
+  const cle = grhEntretienCle(code, annee);
+  GRH_ENTRETIENS_ANNUELS[cle] = { date: date||null, communique, updatedAt: new Date().toISOString(), updatedBy: identity };
+  toast('✅ Entretien individuel annuel '+annee+' de '+grhLabel(code)+' enregistré.');
+  renderTab7();
+  grhPersistEntretiensAnnuels();
+}
+function grhRenderEntretienAnnuelCard(code, canEditAdmin){
+  const annee = grhEntretienAnneeCourante();
+  const entry = grhEntretienEntry(code, annee);
+  const alerte = grhEntretienAlerteInfo(code, annee);
+  const cleActuelle = grhEntretienCle(code, annee);
+  const historique = Object.keys(GRH_ENTRETIENS_ANNUELS).filter(k=>k.startsWith(code+'-') && k!==cleActuelle).sort().reverse();
+  return `<div class="repartition-panel" style="margin-bottom:14px">
+    <div class="repartition-panel-title">🗣️ Entretien individuel annuel — ${annee}<span class="k8-newtag">NEW</span></div>
+    ${alerte ? `<div class="badge outline" style="display:block;margin-bottom:8px;border-color:${alerte.level==='urgent'?'var(--crit-haute)':'var(--status-enattente)'};color:${alerte.level==='urgent'?'#a3231c':'#8a5c04'}">${esc(alerte.text)}</div>` : ""}
+    ${canEditAdmin ? `
+    <div class="field-grid">
+      <div class="field"><span class="lbl" style="text-transform:none;letter-spacing:0">Date de l'entretien (janvier ${annee})</span><input type="date" id="grh-entretien-date-${esc(code)}" value="${esc(entry.date||"")}"></div>
+      <div class="field"><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;margin-top:18px"><input type="checkbox" id="grh-entretien-communique-${esc(code)}" ${entry.communique?"checked":""}> Date communiquée au salarié</label></div>
+    </div>
+    <button class="btn btn-primary1 btn-sm" style="margin-top:8px" onclick="grhEnregistrerEntretien('${esc(code)}')">💾 Enregistrer</button>
+    ${entry.updatedAt ? `<div class="demo-label" style="margin-top:6px">Dernière modification : ${new Date(entry.updatedAt).toLocaleString('fr-FR')} par ${esc(grhLabel(entry.updatedBy)||entry.updatedBy||"—")}</div>` : ""}
+    ` : `
+    <div class="demo-label" style="margin:4px 0">${entry.date ? `Date prévue : <b>${esc(fmtDateFR(entry.date)||entry.date)}</b>${entry.communique?" ✅ communiquée":" — en attente de confirmation par Rémi/Mélissa"}` : "Date non encore fixée par Rémi/Mélissa."}</div>
+    `}
+    ${historique.length ? `<div style="font-size:11.5px;margin-top:10px">${historique.map(k=>{
+        const h = GRH_ENTRETIENS_ANNUELS[k];
+        const anneeH = k.split('-').pop();
+        return "↳ <b>"+esc(anneeH)+"</b> — "+(h.date?("date : "+esc(fmtDateFR(h.date)||h.date)):"date non renseignée")+(h.communique?" ✅ communiquée":"");
       }).join("<br>")}</div>` : ""}
   </div>`;
 }
@@ -8104,9 +8505,21 @@ function renderTab7(){
   // APPA 13). "GRH Franchise" est donc un panneau dédié, sans exposer les fiches RH internes de
   // l'équipe (y compris celle d'Ala) qui restent strictement réservées à RE/ME/AC.
   if (identity==="RL"){
+    // V19 (demande Rémi 12/11/2026) : Romain voit désormais aussi l'organigramme APPA SERVICES dans ce
+    // panneau "GRH Franchise" — même fonction/donnée que pour l'équipe interne (kpiRenderOrganigramme,
+    // KPI_ORG_CHART), qui n'expose que noms + intitulés de poste/hiérarchie, jamais de donnée RH sensible
+    // (contrat, salaire, NIR, congés…) — cohérent avec le fait qu'il n'a, par construction, accès à
+    // aucune de ces données (ni les siennes chez APPA 13, ni celles de l'équipe). Reste inchangé : pas de
+    // fiche GRH interne pour lui, pas d'accès aux 5 fiches de l'équipe APPA 13.
     host.innerHTML = `
       <div class="grh-banner admin">🏳️ GRH Franchise — Romain Lotito (APPA Services 59). En tant que franchisé indépendant, vous n'avez pas de fiche GRH interne chez APPA Services 13 (pas de contrat de travail avec APPA 13). La gestion RH de votre propre structure (APPA Services 59) reste de votre responsabilité.</div>
-      <div class="generic-note">Pour toute question RH concernant votre convention de franchise ou l'équipe APPA Services 13 qui accompagne votre portefeuille, votre contact dédié est <b>Ala Chouial</b> (assistante RH APPA Services 13).</div>`;
+      <div class="generic-note">Pour toute question RH concernant votre convention de franchise ou l'équipe APPA Services 13 qui accompagne votre portefeuille, votre contact dédié est <b>Ala Chouial</b> (assistante RH APPA Services 13).</div>
+      <div class="card" style="margin-top:14px;">
+        <h3>🗂️ Organigramme APPA SERVICES</h3>
+        <div class="mod-sub">Généré automatiquement depuis les identités actives — toujours à jour.</div>
+        <div id="organigramme-wrap-grh-rl" class="org-chart"></div>
+      </div>`;
+    kpiRenderOrganigramme('organigramme-wrap-grh-rl');
     return;
   }
   // V18 (demande Rémi) : "isAdmin" ici ne veut dire que "peut parcourir la liste des 5 fiches" — Ala (AC)
@@ -8134,9 +8547,15 @@ function renderTab7(){
           </div>`;
         }).join("")}
       </div>
+      <div class="card" style="margin-top:14px;">
+        <h3>🗂️ Organigramme APPA SERVICES</h3>
+        <div class="mod-sub">Généré automatiquement depuis les identités actives et les fiches GRH — toujours à jour. Même organigramme que celui de l'Onglet 8 KPI, désormais visible aussi ici (demande Rémi 11/11/2026).</div>
+        <div id="organigramme-wrap-grh" class="org-chart"></div>
+      </div>
       ${grhRenderReunionsEquipeCard()}
       ${renderGrhJournalPanel()}`;
     renderGrhBell();
+    kpiRenderOrganigramme('organigramme-wrap-grh');
     return;
   }
   renderGrhDetail(effectiveOpenId, grhIsAdmin(effectiveOpenId));
@@ -8348,6 +8767,8 @@ function renderGrhDetail(code, isAdmin){
       <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addGrhAvenant('${esc(code)}')">➕ Ajouter un avenant</button>` : ""}
     </div>
 
+    ${grhRenderEntretienAnnuelCard(code, canEditAdmin)}
+
     ${isTNS ? `
     <div class="repartition-panel" style="margin-bottom:14px">
       <div class="repartition-panel-title">🏖️ Congés payés</div>
@@ -8377,7 +8798,20 @@ function renderGrhDetail(code, isAdmin){
     ${renderGrhSemainierPanel(code, g, grhCanEditSelfInfo(code))}
     ${renderGrhInfosComplementaires(code, g, grhCanEditSelfInfo(code))}
     ${renderGrhDiscussionPanel(code, g)}
-    ${isAdmin ? renderGrhJournalPanel(code) : ""}`;
+    ${!isAdmin ? grhRenderReunionMini() : ""}
+    ${isAdmin ? renderGrhJournalPanel(code) : ""}
+    <div class="card" style="margin-top:14px;">
+      <h3>🗂️ Organigramme APPA SERVICES</h3>
+      <div class="mod-sub">Généré automatiquement depuis les identités actives — toujours à jour.</div>
+      <div id="organigramme-wrap-grh-fiche" class="org-chart"></div>
+    </div>`;
+  // V20 (demande Rémi 12/11/2026) : avant cette MAJ, un salarié non-admin (Cindy, Hinda, et tout futur
+  // salarié) ne passait jamais par la "vue équipe" de renderTab7() (ligne ~8543) — il tombait directement
+  // ici, sur sa propre fiche — donc ne voyait JAMAIS l'organigramme, contrairement à RE/ME/Ala (vue équipe)
+  // et Romain (branche GRH Franchise dédiée). Rémi a demandé qu'il soit "visible dans GRH pour tous" :
+  // ajouté ici aussi, même fonction/donnée (kpiRenderOrganigramme, KPI_ORG_CHART), pour que CHAQUE identité
+  // ayant accès à l'onglet GRH (admin ou pas) le voie, quelle que soit la vue dans laquelle elle atterrit.
+  kpiRenderOrganigramme('organigramme-wrap-grh-fiche');
 }
 function grhAbsFormHTML(code, type){
   const titres = {CP:"Demande de congé payé", MALADIE:"Déclarer un arrêt maladie", AUTRE:"Déclarer une autre absence"};
@@ -8524,6 +8958,26 @@ function grhHeuresAbsenceBornes(a){
   else { endExclusive = new Date((a.dateFin||a.dateDebut)+"T00:00:00"); endExclusive.setDate(endExclusive.getDate()+1); }
   return {start, endExclusive};
 }
+// MAJ 11/11/2026 (demande Rémi) — "prévoir CP sur le jour concerné" : détecte AUTOMATIQUEMENT, pour un jour
+// donné de la déclaration d'heures, s'il tombe dans une absence CP/maladie déjà déclarée dans g.absences
+// (même source unique que grhHeuresAbsenceJoursMois ci-dessus — jamais une ressaisie séparée). Combiné avec
+// un marquage MANUEL (j.cpManuel) pour les cas pas encore déclarés ailleurs — "automatique ET manuel"
+// (confirmé par Rémi) : voir saveGrhHeuresJour (validation à l'enregistrement) et grhHeuresCardHTML/
+// grhHeuresJourFormHTML (affichage du badge CP sur le jour).
+function grhJourAbsenceInfo(g, dateStr){
+  if (!dateStr) return null;
+  const d = new Date(dateStr+"T00:00:00");
+  for (const a of (g.absences||[])){
+    if (a.type!=="CP" && a.type!=="MALADIE") continue;
+    if (!a.dateDebut) continue;
+    const {start, endExclusive} = grhHeuresAbsenceBornes(a);
+    if (d>=start && d<endExclusive) return {type:a.type};
+  }
+  return null;
+}
+function grhHeuresJourEstCp(g, j){
+  return !!grhJourAbsenceInfo(g, j.date) || !!j.cpManuel;
+}
 function grhHeuresAbsenceJoursMois(g, mois){
   // Source UNIQUE : g.absences, déjà déclarées/validées dans le module GRH Absences existant — jamais une
   // ressaisie séparée (confirmé par Rémi le 09/11/2026 : ces mêmes absences alimenteront aussi le calcul
@@ -8665,8 +9119,8 @@ function renderGrhHeuresPanel(code, g){
   const enCours = list.filter(d=>!grhHeuresCloturee(d));
   const btnStyle = active => `border-color:var(--tab7-strong);color:${active?'#fff':'var(--tab7-ink)'};${active?'background:var(--tab7-strong)':'background:var(--surface)'}`;
   return `
-    <div class="repartition-panel" style="margin-bottom:14px">
-      <div class="repartition-panel-title">⏱️ Heures travaillées</div>
+    <div class="repartition-panel" style="margin-bottom:14px;background:var(--heurestrav-bg);border-color:var(--heurestrav-border)">
+      <div class="repartition-panel-title" style="color:var(--heurestrav-ink)">⏱️ Heures travaillées</div>
       <div class="demo-label" style="margin-bottom:8px">${esc(grhLabel(code))} déclare ses heures jour par jour (matin + après-midi) ; Rémi et Mélissa valident chacun séparément, puis Ala effectue la vérification finale pour établir la fiche de paie du mois. L'objectif du mois tient compte des congés payés/arrêts maladie déjà déclarés et du report cumulé du mois précédent.</div>
       <div class="sub-tabs">
         <button class="sub-tab-btn ${onglet==='actuel'?'active':''}" style="${btnStyle(onglet==='actuel')}" onclick="grhHeuresOnglet['${esc(code)}']='actuel';renderTab7()">📝 Déclaration mensuelle</button>
@@ -8791,7 +9245,13 @@ async function createGrhDeclarationHeures(code){
     modifJournal: [],
     // V36ter (demande Rémi 11/11/2026) : note libre + fil de commentaires PAR MOIS déclaré — additifs au
     // champ "commentaire" ci-dessus (qui reste figé à l'ouverture), voir grhHeuresNoteEtFilHTML ci-dessous.
-    noteLibre: null, filCommentaires: []
+    noteLibre: null, filCommentaires: [],
+    // V38 (demande Rémi 12/11/2026) : note courte, collée à la ligne de statut (En cours de saisie /
+    // Validation Rémi / Validation Mélissa / Vérification Ala) — distincte du gros bloc "📌 Note libre"
+    // plus bas dans la carte, qui demande de dérouler toute la déclaration pour être vue. Celle-ci reste
+    // visible en un coup d'œil à côté du statut, pour une remarque rapide "si besoin" (ex. justification
+    // d'un retard de saisie, précision pour Ala avant vérification) sans dupliquer le gros bloc existant.
+    noteStatut: null
   };
   const declarationsHeures = [...(g.declarationsHeures||[]), decl];
   grhHeuresFormOpen = null;
@@ -8802,7 +9262,12 @@ function grhHeuresJourFormHTML(code, g, d){
   const editing = grhHeuresJourFormOpen && grhHeuresJourFormOpen.code===code && grhHeuresJourFormOpen.declId===d.id ? grhHeuresJourFormOpen : null;
   if (!editing) return "";
   const jourExistant = editing.date ? (d.jours||[]).find(j=>j.date===editing.date) : null;
-  const j = jourExistant || {date:"", matinDebut:"", matinFin:"", apresMidiDebut:"", apresMidiFin:""};
+  const j = jourExistant || {date:editing.date||"", matinDebut:"", matinFin:"", apresMidiDebut:"", apresMidiFin:"", cpManuel:false};
+  // MAJ 11/11/2026 (demande Rémi) : détection auto depuis les absences déjà déclarées (si la date est déjà
+  // connue) — n'affiche la case à cocher manuelle que si rien n'est détecté automatiquement, pour ne pas
+  // dupliquer l'information. Un jour sans horaire ET sans CP (ni auto, ni manuel) est refusé à l'enregistrement
+  // par saveGrhHeuresJour ci-dessous.
+  const autoInfo = grhJourAbsenceInfo(g, j.date);
   return `
     <div class="grh-abs-card" style="border-color:var(--tab7-strong);margin-top:8px">
       <div style="font-weight:800;font-size:12.5px;margin-bottom:8px;color:var(--tab7-ink)">${jourExistant?"Modifier le":"Ajouter un"} jour — ${esc(grhReunionMoisLabel(d.mois))}</div>
@@ -8812,6 +9277,12 @@ function grhHeuresJourFormHTML(code, g, d){
         <div class="field"><span class="lbl">Matin — fin</span><input type="time" id="grh_hj_mF_${esc(code)}_${esc(d.id)}" value="${esc(j.matinFin||"")}"></div>
         <div class="field"><span class="lbl">Après-midi — début</span><input type="time" id="grh_hj_aD_${esc(code)}_${esc(d.id)}" value="${esc(j.apresMidiDebut||"")}"></div>
         <div class="field"><span class="lbl">Après-midi — fin</span><input type="time" id="grh_hj_aF_${esc(code)}_${esc(d.id)}" value="${esc(j.apresMidiFin||"")}"></div>
+        <div class="field">
+          <span class="lbl">Jour CP / absence</span>
+          ${autoInfo
+            ? `<span class="badge outline" style="border-color:var(--status-enattente);color:#8a5c04">🏖️ ${autoInfo.type==='CP'?'CP':'Arrêt maladie'} déjà déclaré — détecté automatiquement</span>`
+            : `<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400"><input type="checkbox" id="grh_hj_cp_${esc(code)}_${esc(d.id)}" ${j.cpManuel?"checked":""}> Marquer ce jour comme CP (pas encore déclaré dans Absences)</label>`}
+        </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <button class="btn btn-primary1 btn-sm" onclick="saveGrhHeuresJour('${esc(code)}','${esc(d.id)}')">✅ Enregistrer ce jour</button>
@@ -8830,9 +9301,22 @@ async function saveGrhHeuresJour(code, declId){
   const matinFin = document.getElementById(`${pfx}mF_${code}_${declId}`).value || null;
   const apresMidiDebut = document.getElementById(`${pfx}aD_${code}_${declId}`).value || null;
   const apresMidiFin = document.getElementById(`${pfx}aF_${code}_${declId}`).value || null;
+  const cpCheckbox = document.getElementById(`${pfx}cp_${code}_${declId}`);
+  const cpManuel = cpCheckbox ? !!cpCheckbox.checked : false;
   if (!dateStr){ toast("⚠️ Merci d'indiquer la date"); return; }
   if (!dateStr.startsWith(decl.mois)){ toast(`⚠️ Cette date n'est pas dans ${grhReunionMoisLabel(decl.mois)}`); return; }
-  const nouveauJour = {date: dateStr, matinDebut, matinFin, apresMidiDebut, apresMidiFin};
+  // MAJ 11/11/2026 (demande Rémi) : un jour ne peut plus être enregistré totalement vide (ni horaire, ni CP)
+  // — c'est ce qui produisait un "0 h" fantôme dans le calcul mensuel/hebdo (le calcul lui-même était déjà
+  // correct, confirmé par test direct). Exception automatique si le jour tombe dans une absence CP/maladie
+  // déjà déclarée (g.absences), ou si l'utilisateur coche manuellement "Jour CP" pour un cas pas encore
+  // déclaré ailleurs — "automatique ET manuel" (confirmé par Rémi).
+  const aucuneHeure = grhHeuresJourTotal({matinDebut, matinFin, apresMidiDebut, apresMidiFin}) === 0;
+  const auto = grhJourAbsenceInfo(g, dateStr);
+  if (aucuneHeure && !auto && !cpManuel){
+    toast("⚠️ Merci de renseigner au moins un créneau horaire, ou de cocher « Jour CP » si c'est un congé payé / une absence.");
+    return;
+  }
+  const nouveauJour = {date: dateStr, matinDebut, matinFin, apresMidiDebut, apresMidiFin, cpManuel: !!cpManuel};
   const ancienJour = (decl.jours||[]).find(j=>j.date===dateStr);
   const jours = ancienJour
     ? (decl.jours||[]).map(j=> j.date===dateStr ? nouveauJour : j)
@@ -8914,6 +9398,32 @@ function grhHeuresNoteEtFilHTML(code, g, d){
       </div>` : ""}
     </div>`;
 }
+// V38 (demande Rémi 12/11/2026) : note courte collée à la ligne de statut — voir commentaire sur
+// `noteStatut` dans createGrhDeclarationHeures ci-dessus. Mêmes droits d'écriture que la note libre /
+// le fil de commentaires (grhHeuresPeutCommenter) : le salarié concerné + RE/ME/AC. Affichage toujours
+// visible (pas de bouton "déplier") : un simple champ texte inline, large, + un bouton Enregistrer qui
+// n'apparaît que si quelque chose a changé n'est pas vérifié ici par souci de simplicité — comme pour
+// saveGrhHeuresNote, l'enregistrement est explicite (pas d'auto-save au blur) pour éviter une sauvegarde
+// accidentelle à chaque clic ailleurs dans la carte.
+function grhHeuresStatutNoteHTML(code, g, d){
+  const peutEcrire = grhHeuresPeutCommenter(code);
+  if (!peutEcrire && !d.noteStatut) return "";
+  return `<span style="display:inline-flex;align-items:center;gap:5px;flex:1;min-width:220px">
+    <input type="text" id="grh_hStatutNote_${esc(code)}_${esc(d.id)}" value="${esc(d.noteStatut||"")}" placeholder="Remarque rapide à côté du statut, si besoin…" ${peutEcrire?"":"disabled"}
+      style="flex:1;min-width:160px;font:inherit;font-size:11.5px;padding:4px 8px;border:1px solid var(--hairline);border-radius:6px;background:${peutEcrire?'var(--surface)':'transparent'}">
+    ${peutEcrire ? `<button class="btn btn-outline btn-sm" style="padding:3px 8px" onclick="saveGrhHeuresNoteStatut('${esc(code)}','${esc(d.id)}')">💾</button>` : ""}
+  </span>`;
+}
+async function saveGrhHeuresNoteStatut(code, declId){
+  if (!grhHeuresPeutCommenter(code)) return;
+  const g = grhOf(code);
+  const decl = (g.declarationsHeures||[]).find(d=>d.id===declId);
+  if (!decl) return;
+  const noteStatut = (document.getElementById(`grh_hStatutNote_${code}_${declId}`).value||"").trim();
+  const declarationsHeures = (g.declarationsHeures||[]).map(d=> d.id===declId ? {...decl, noteStatut: noteStatut||null} : d);
+  await saveGrh(code, {declarationsHeures}, [{field:"Heures travaillées — note à côté du statut", before:decl.noteStatut||"—", after:noteStatut||"—"}], `Heures travaillées — note à côté du statut (${grhReunionMoisLabel(decl.mois)})`);
+  toast("💾 Note enregistrée — "+grhLabel(code));
+}
 function grhHeuresCardHTML(code, g, d){
   const status = grhHeuresStatus(d);
   const canRE = identity==="RE", canME = identity==="ME", canAla = identity==="AC";
@@ -8925,18 +9435,26 @@ function grhHeuresCardHTML(code, g, d){
   const modifs = (d.modifJournal||[]).slice().reverse().map(m=>`${new Date(m.when).toLocaleString('fr-FR')} — ${esc(grhLabel(m.who)||m.who)} a modifié le ${esc(fmtDateFR(m.date))} : <i>${esc(m.avant)}</i> → <b>${esc(m.apres)}</b>`).join("<br>");
   const semainesHTML = semaines.length ? semaines.map(s=>{
     const semEcart = semObjectif!=null ? Math.round((s.total-semObjectif)*100)/100 : null;
-    const joursHTML = s.jours.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(j=>`
+    const joursHTML = s.jours.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(j=>{
+      // MAJ 11/11/2026 (demande Rémi) — badge CP sur le jour concerné : auto (absence déjà déclarée) ou
+      // manuel (case cochée à la saisie). grhHeuresJourTotal(j) reste à 0 h pour un jour CP, c'est attendu.
+      const estCp = grhHeuresJourEstCp(g, j);
+      return `
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:3px 0;font-size:11.5px;border-top:1px solid var(--border)">
-        <span>${esc(fmtDateFR(j.date))} — ${j.matinDebut&&j.matinFin?`${esc(j.matinDebut)}-${esc(j.matinFin)}`:"—"} / ${j.apresMidiDebut&&j.apresMidiFin?`${esc(j.apresMidiDebut)}-${esc(j.apresMidiFin)}`:"—"} <b>(${grhHeuresJourTotal(j)} h)</b></span>
+        <span>${esc(fmtDateFR(j.date))} — ${estCp ? `<span class="badge outline" style="border-color:var(--status-enattente);color:#8a5c04;padding:1px 6px">🏖️ CP</span>` : `${j.matinDebut&&j.matinFin?`${esc(j.matinDebut)}-${esc(j.matinFin)}`:"—"} / ${j.apresMidiDebut&&j.apresMidiFin?`${esc(j.apresMidiDebut)}-${esc(j.apresMidiFin)}`:"—"} <b>(${grhHeuresJourTotal(j)} h)</b>`}</span>
         ${peutModifier ? `<span style="display:flex;gap:4px;flex-shrink:0">
           <button class="btn btn-outline btn-sm" style="padding:2px 7px" onclick="grhHeuresJourFormOpen={code:'${esc(code)}',declId:'${esc(d.id)}',date:'${esc(j.date)}'};renderTab7()">✏️</button>
           <button class="btn btn-outline btn-sm" style="padding:2px 7px" onclick="deleteGrhHeuresJour('${esc(code)}','${esc(d.id)}','${esc(j.date)}')">🗑️</button>
         </span>` : ""}
-      </div>`).join("");
+      </div>`;}).join("");
+    // MAJ 11/11/2026 (demande Rémi) — "prévoir vue nombre heure par semaine" + fix du texte "Semaine 420 h"
+    // (bug d'AFFICHAGE : "Semaine 42" et "0 h (...)" étaient collés sans séparateur visible une fois le
+    // texte copié à plat hors de la mise en page flex). Séparateur " · " explicite + icône, pour que le
+    // texte reste lisible même copié-collé en brut, et total hebdo mis en avant plus clairement.
     return `<div style="margin-top:6px;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:8px">
       <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700">
-        <span>Semaine ${esc(s.semaine.split('-S')[1])}</span>
-        <span>${s.total} h${semEcart!=null ? ` <span style="color:${Math.abs(semEcart)<0.05?'#006300':'#6b5400'}">(${semEcart>0?"+":""}${semEcart} h / ${semObjectif} h)</span>` : ""}</span>
+        <span>📅 Semaine ${esc(s.semaine.split('-S')[1])} <span style="color:var(--ink-2);font-weight:400">·</span> Total : ${s.total} h</span>
+        <span>${semEcart!=null ? `<span style="color:${Math.abs(semEcart)<0.05?'#006300':'#6b5400'}">(${semEcart>0?"+":""}${semEcart} h / ${semObjectif} h objectif)</span>` : ""}</span>
       </div>
       ${joursHTML}
     </div>`;
@@ -8951,7 +9469,10 @@ function grhHeuresCardHTML(code, g, d){
     ${peutModifier ? `<button class="btn btn-outline btn-sm" style="margin:4px 0" onclick="grhHeuresJourFormOpen={code:'${esc(code)}',declId:'${esc(d.id)}',date:null};renderTab7()">➕ Ajouter un jour</button>` : ""}
     ${grhHeuresJourFormOpen && grhHeuresJourFormOpen.code===code && grhHeuresJourFormOpen.declId===d.id ? grhHeuresJourFormHTML(code, g, d) : ""}
     ${semainesHTML}
-    <span class="badge outline" style="display:inline-block;margin:8px 0 4px">${status.label}</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 4px">
+      <span class="badge outline" style="display:inline-block">${status.label}</span>
+      ${grhHeuresStatutNoteHTML(code, g, d)}
+    </div>
     <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
       <div class="grh-step-row ${d.valideRE?'done':''}" ${canRE?`style="cursor:pointer" onclick="toggleGrhHeuresValidation('${esc(code)}','${esc(d.id)}','RE')"`:''}><span class="dot">${d.valideRE?'✓':''}</span>Validation Rémi${!canRE && !d.valideRE?' (en attente)':''}</div>
       <div class="grh-step-row ${d.valideME?'done':''}" ${canME?`style="cursor:pointer" onclick="toggleGrhHeuresValidation('${esc(code)}','${esc(d.id)}','ME')"`:''}><span class="dot">${d.valideME?'✓':''}</span>Validation Mélissa${!canME && !d.valideME?' (en attente)':''}</div>
@@ -9923,22 +10444,36 @@ async function cycleRum(id){
 function scopedClients(){
   return identity==="RL" ? clients.filter(c=>c.departement==="59") : clients;
 }
-// V26 (demande Rémi, cadrage verrouillé le 04/10/2026) : accès élargi de Romain Lotito (RL, franchisé
-// 59) au portefeuille du département 13 "comme Cindy" — UNIQUEMENT pour les onglets 1 (Administratif/
-// Clients), 2 (CRM opérationnel/fiches) et 3 (Tasking), là où cette fonction est utilisée ci-dessous.
-// Son propre Reporting Franchisé (fonctions rl8*, onglet 8 côté Romain) et la Cartographie (Annuaire)
-// restent strictement scopés à son département 59 via scopedClients() — aucun changement sur ces
-// deux points, ni sur les restrictions V17 existantes (lecture seule Opérationnel, sous-onglets
-// Urgences/Interne masqués pour RL dans Tasking) : seule la VISIBILITÉ du portefeuille client change.
+// V26 (demande Rémi, cadrage verrouillé le 04/10/2026, ANNULÉ le 12/11/2026) : accès élargi de Romain
+// Lotito (RL, franchisé 59) au portefeuille du département 13 "comme Cindy" — UNIQUEMENT pour les
+// onglets 1 (Administratif/Clients), 2 (CRM opérationnel/fiches) et 3 (Tasking), là où cette fonction
+// est utilisée ci-dessous.
+// REVERT (demande Rémi 12/11/2026) : Rémi a constaté un décompte "clients actifs APPA 59" confus pour
+// Romain (le mélange visuel portefeuille 59 + portefeuille 13 "sous-traitance" rendait la lecture du
+// nombre réel de clients actifs 59 peu claire — "trop compliqué") et a demandé que Romain retrouve
+// une visibilité strictement limitée à son propre portefeuille 59, sans aucune visibilité sur le 13.
+// scopedClientsWide() se comporte donc à nouveau EXACTEMENT comme scopedClients() pour RL (département
+// 59 uniquement) — la fonction est conservée telle quelle (plutôt que supprimée) pour ne pas avoir à
+// retoucher les 6 points d'appel existants, et parce que l'accès élargi "comme Cindy" pourrait un jour
+// être redemandé. Son propre Reporting Franchisé (fonctions rl8*, onglet 8 côté Romain) et la
+// Cartographie (Annuaire) restaient déjà strictement scopés à son département 59 via scopedClients() —
+// aucun changement sur ces deux points, ni sur les restrictions V17 existantes (lecture seule
+// Opérationnel, sous-onglets Urgences/Interne masqués pour RL dans Tasking).
 function scopedClientsWide(){
-  return identity==="RL" ? clients.filter(c=>c.departement==="59" || c.departement==="13") : clients;
+  return identity==="RL" ? clients.filter(c=>c.departement==="59") : clients;
 }
-// Sous-onglets génériques "Mon agence 59 / Agence 13" pour Romain (RL) — réutilisés tels quels dans les
-// Onglets 1, 2 et 3 (demande Rémi 11/11/2026 : étendre le système construit pour l'Onglet 1 aux 2 autres
-// onglets où il a le même accès élargi scopedClientsWide()). hostId : div hôte dans ce sous-onglet
-// précis ; deptFiltreId : id du <select> Département générique à masquer pour RL (évite la confusion
-// avec les sous-onglets) ; rerenderFnName : nom (string) de la fonction de rendu de l'onglet appelant,
-// invoquée au clic pour rafraîchir la liste avec le nouveau périmètre.
+// Bandeau de périmètre pour Romain (RL) — réutilisé tel quel dans les Onglets 1, 2 et 3 (construit le
+// 11/11/2026 comme un double sous-onglet "Mon agence 59 / Agence 13", RETIRÉ le 12/11/2026 à la
+// demande de Rémi : "trop compliqué", et surtout source de confusion sur le vrai nombre de clients
+// ACTIFS du 59 (le chiffre mélangeait portefeuille 59 et 13, et comptait aussi les prospects/en
+// attente — pas seulement les actifs). Romain n'a donc plus AUCUNE visibilité sur le département 13
+// (scopedClientsWide() redevenu strictement dept 59, voir plus haut) : il n'y a donc plus rien à faire
+// "basculer" — ce n'est plus un sous-onglet cliquable, juste un bandeau d'information fixe qui
+// distingue clairement le nombre de clients ACTIFS du nombre total de dossiers ouverts (prospects/en
+// attente/etc. inclus), pour éviter toute nouvelle confusion sur ce point précis.
+// hostId : div hôte dans ce sous-onglet précis ; deptFiltreId : id du <select> Département générique à
+// masquer pour RL (il n'a qu'un seul département visible, le filtre serait trompeur) ; rerenderFnName
+// n'est plus utilisé ici (plus de clic), conservé en paramètre pour ne pas changer les 3 appels existants.
 function renderRlAgenceSubTab(hostId, deptFiltreId, rerenderFnName){
   const host = document.getElementById(hostId);
   if (!host) return;
@@ -9948,15 +10483,13 @@ function renderRlAgenceSubTab(hostId, deptFiltreId, rerenderFnName){
     if (deptFiltre) deptFiltre.style.display = "";
     return;
   }
-  // Le filtre "Département" générique est redondant (et trompeur) pour Romain une fois les sous-onglets
-  // actifs — masqué uniquement pour lui, intact pour tout le monde d'autre.
   if (deptFiltre) deptFiltre.style.display = "none";
-  const n59 = clients.filter(c=>c.departement==="59" && c.statut!=="INACTIF").length;
-  const n13 = clients.filter(c=>c.departement==="13" && c.statut!=="INACTIF").length;
+  const base59 = clients.filter(c=>c.departement==="59" && c.statut!=="INACTIF");
+  const n59Actifs = base59.filter(c=>c.statut==="ACTIF").length;
+  const n59Total = base59.length;
   host.innerHTML = `
     <div class="rl-agence-subtabs">
-      <button class="rl-agence-btn rl-agence-59 ${rlAgenceView==='59'?'active':''}" onclick="rlAgenceView='59';t1FormuleFilter=null;${rerenderFnName}()">🟢 Mon agence — APPA Services 59<span class="rl-agence-count">${n59}</span></button>
-      <button class="rl-agence-btn rl-agence-13 ${rlAgenceView==='13'?'active':''}" onclick="rlAgenceView='13';t1FormuleFilter=null;${rerenderFnName}()">🔶 Agence 13 (sous-traitance)<span class="rl-agence-count">${n13}</span></button>
+      <span class="rl-agence-btn rl-agence-59 active" style="cursor:default">🟢 APPA Services 59 — <b>${n59Actifs}</b> actif${n59Actifs>1?"s":""} <span style="opacity:.75">/ ${n59Total} dossier${n59Total>1?"s":""} au total</span></span>
     </div>`;
 }
 function filteredClients(){
@@ -10527,6 +11060,8 @@ function renderClientDetail(id){
       </div>` : `<div class="demo-label">Cocher "Avenant" dans Modifier pour enregistrer un nouvel avenant — un nouveau n° de contrat est généré automatiquement, le RUM est conservé sauf changement de mandataire MJPM, et l'ancien tarif reste conservé en historique.</div>`}
     </div>
 
+    ${switchTypeBoxHTML(c)}
+
     <h3 class="sub-title">Médecin traitant &amp; personne de confiance</h3>
     <div class="field-grid">
       <div class="field"><span class="lbl">Médecin traitant</span><span class="val ${c.medecinTraitant?'':'nc'}">${esc(c.medecinTraitant)||"NC"}</span></div>
@@ -10885,6 +11420,107 @@ async function saveEditClient(id){
   await updateClient(id, patch, histParts.join(" · "), [{field:"fiche", before:"—", after:"modifiée"}]);
   document.getElementById(`editHost_${id}`).innerHTML = ""; document.getElementById(`editHost_${id}`).dataset.open="0";
   toast("Fiche enregistrée");
+}
+
+// V39 (demande Rémi 12/11/2026) : "Changer de type (Heure ↔ Formule) — en gardant une trace historique
+// complète. Décisions validées par Rémi (QCM) :
+//  1. Au changement, un NOUVEAU n° de contrat est généré avec le préfixe corrigé (CLF-/CLH-) — même
+//     mécanisme que l'avenant Formule->Formule (numContratOrigine/numContrat), l'ancien numéro reste
+//     tracé (jamais écrasé/perdu).
+//  2. Effet immédiat (le type change tout de suite dans la fiche) MAIS une "date de début" est quand
+//     même demandée et enregistrée, pour mémoire (ce n'est pas une activation différée).
+//  3. Aucune restriction de droits particulière : accessible à toute l'équipe ayant accès à la fiche
+//     client (même niveau que "✏️ Modifier" pour cette fiche — pas de gate GRH-style).
+// L'ancien type et ses champs spécifiques (formuleBase/formuleDuo pour une fiche Formule) ne sont
+// JAMAIS effacés lors du switch — seule une nouvelle valeur est redemandée/écrite si on repasse vers
+// Formule plus tard, pour éviter qu'une ancienne formule "dormante" ne resurgisse par erreur.
+function switchTypeBoxHTML(c){
+  const id = c.id;
+  const histo = c.historiqueChangementsType || [];
+  const dernier = histo[histo.length-1];
+  const cibleType = c.type === "FORMULE" ? "HEURES" : "FORMULE";
+  const cibleLabel = cibleType === "FORMULE" ? "⏱️ Heures → 📋 Formule" : "📋 Formule → ⏱️ Heures";
+  return `<div class="avenant-box">
+      <div class="avenant-check">🔄 Changer de type de client (Heure ↔ Formule)
+        <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="toggleSwitchType('${id}')">${switchTypeOpen[id]?"✖ Annuler":"🔄 Changer de type"}</button>
+      </div>
+      ${dernier ? `<div class="field-grid" style="margin-top:8px">
+        <div class="field"><span class="lbl">Dernier changement</span><span class="val">${esc(dernier.ancienType==="FORMULE"?"📋 Formule":"⏱️ Heures")} → ${esc(dernier.nouveauType==="FORMULE"?"📋 Formule":"⏱️ Heures")} le ${esc(dernier.dateEffet)||"—"}</span></div>
+        <div class="field"><span class="lbl">N° de contrat</span><span class="val">${esc(dernier.nouveauNumContrat)} <small style="color:var(--ink-muted)">(ancien : ${esc(dernier.ancienNumContrat)})</small></span></div>
+        <div class="field"><span class="lbl">Effectué par</span><span class="val">${esc(dernier.effectuePar)||"—"} ${dernier.effectueLe?("· "+new Date(dernier.effectueLe).toLocaleString('fr-FR')):""}</span></div>
+      </div>` : `<div class="demo-label">Permet de faire basculer cette fiche de ${c.type==='FORMULE'?'Formule':'Heures'} vers ${cibleType==='FORMULE'?'Formule':'Heures'} — un nouveau n° de contrat est généré avec le préfixe correspondant, l'ancien reste tracé en historique, et le changement est visible dans "🕒 Historique de la fiche" ci-dessous.</div>`}
+      <div id="switchTypeHost_${id}">${switchTypeOpen[id] ? switchTypeFormHTML(c, cibleType, cibleLabel) : ""}</div>
+    </div>`;
+}
+function switchTypeFormHTML(c, cibleType, cibleLabel){
+  const id = c.id;
+  return `<div class="avenant-fields form-grid show" style="margin-top:8px">
+      <div style="grid-column:1/-1"><b>${esc(cibleLabel)}</b> — numéro de contrat actuel : ${esc(c.numContrat||c.id)}</div>
+      ${cibleType === "FORMULE" ? `
+      <div><label>Nouvelle formule</label><select id="st_formule_${id}">${["F1","F2","F3"].map(f=>`<option value="${f}" ${(c.formuleBase||"F1")===f?"selected":""}>${esc(formuleLabel(f))}</option>`).join("")}</select></div>
+      <div><label><input type="checkbox" id="st_duo_${id}" ${c.structureDuo?"checked":""}> Offre DUO (fiche 2 personnes)</label></div>
+      ` : ""}
+      <div><label>Nouveau tarif TTC (€)</label><input id="st_tarif_${id}" value="${c.tarifTTC!=null?c.tarifTTC:""}"></div>
+      <div><label>📅 Date de début (nouveau type)</label><input id="st_debut_${id}" placeholder="JJ/MM/AAAA"></div>
+    </div>
+    <div class="demo-label" style="margin-top:6px">Le changement est appliqué immédiatement à l'enregistrement — la date de début ci-dessus est conservée pour mémoire, ce n'est pas une activation différée. Un nouveau n° de contrat (${cibleType==="FORMULE"?"CLF-":"CLH-"}…) sera généré ; l'ancien (${esc(c.numContrat||c.id)}) reste consultable dans l'historique de la fiche.</div>
+    <button class="btn btn-primary1" style="margin-top:9px" onclick="submitSwitchType('${id}')">Confirmer le changement de type</button>`;
+}
+function toggleSwitchType(id){
+  switchTypeOpen[id] = !switchTypeOpen[id];
+  renderClientDetail(id);
+}
+async function submitSwitchType(id){
+  const c = clients.find(x=>x.id===id);
+  if (!c) return;
+  const ancienType = c.type;
+  const nouveauType = ancienType === "FORMULE" ? "HEURES" : "FORMULE";
+  const dateEffet = (document.getElementById(`st_debut_${id}`).value||"").trim();
+  if (!dateEffet){ toast("La date de début est obligatoire"); return; }
+  const tarifStr = (document.getElementById(`st_tarif_${id}`).value||"").trim();
+  const tarifTTC = tarifStr ? parseFloat(tarifStr) : null;
+
+  // Même mécanisme que l'avenant Formule->Formule : nouveau numéro généré, origine toujours conservée
+  // (jamais écrasée même en cas de switch multiples dans la vie de la fiche).
+  const base = c.numContratOrigine || c.numContrat || c.id;
+  const ancienNumContrat = c.numContrat || c.id;
+  const year = new Date().getFullYear();
+  const seqBase = clients.filter(x=>x.type===nouveauType).length + 1;
+  const seq = String(seqBase).padStart(3,"0");
+  let nouveauNumContrat = (nouveauType==="FORMULE"?"CLF-":"CLH-") + year + "-" + seq;
+
+  const patch = {
+    type: nouveauType,
+    numContratOrigine: base,
+    numContrat: nouveauNumContrat,
+    tarifTTC
+  };
+  if (nouveauType === "FORMULE"){
+    const formuleSel = document.getElementById(`st_formule_${id}`);
+    const duoChk = document.getElementById(`st_duo_${id}`);
+    const nouvelleFormule = formuleSel ? formuleSel.value : "F1";
+    nouveauNumContrat = `${nouveauNumContrat}-${nouvelleFormule}`;
+    patch.numContrat = nouveauNumContrat;
+    patch.formuleBase = nouvelleFormule;
+    patch.formuleDuo = duoChk ? duoChk.checked : !!c.structureDuo;
+    if (duoChk) patch.structureDuo = duoChk.checked || undefined;
+  }
+  // Champs spécifiques à l'ancien type (formuleBase/formuleDuo) volontairement conservés tels quels si on
+  // quitte Formule — jamais effacés, pour garder une trace complète ; ils seront simplement ignorés tant
+  // que type !== "FORMULE", et redemandés explicitement si l'on repasse vers Formule un jour.
+
+  const evenement = {
+    id: "switchtype_"+Date.now(), ancienType, nouveauType, dateEffet,
+    ancienNumContrat, nouveauNumContrat,
+    effectuePar: identity, effectueLe: nowIso()
+  };
+  const historiqueChangementsType = [...(c.historiqueChangementsType||[]), evenement];
+  patch.historiqueChangementsType = historiqueChangementsType;
+
+  const histWhat = `🔄 Changement de type : ${ancienType==="FORMULE"?"Formule":"Heures"} → ${nouveauType==="FORMULE"?"Formule":"Heures"} (effet au ${dateEffet}) — nouveau n° de contrat ${nouveauNumContrat} (ancien : ${ancienNumContrat}, origine conservée : ${base})`;
+  await updateClient(id, patch, histWhat, [{field:"type", before:ancienType, after:nouveauType}, {field:"numContrat", before:ancienNumContrat, after:nouveauNumContrat}], true);
+  switchTypeOpen[id] = false;
+  toast(`Type changé — nouveau n° de contrat ${nouveauNumContrat}`);
 }
 
 // --- création client ---
@@ -12280,9 +12916,9 @@ function renderTab3(){
   if (!document.getElementById("t3list")) return;
   renderT3StatsBar();
   // V18 (demande Rémi, 11/11/2026 — GO explicite) — Tasking pour Romain Lotito (RL) : la liste principale
-  // des tâches (#t3list) est désormais ouverte à Romain, filtrée par les mêmes sous-onglets département
-  // 59/13 que Tab1/Tab2 (rlAgenceView) — il a déjà accès aux données client des deux départements (59 en
-  // direct, 13 en sous-traitance), donc voir les tâches liées à ces mêmes clients n'ajoute aucune fuite.
+  // des tâches (#t3list) est désormais ouverte à Romain, filtrée sur rlAgenceView (fixé à "59" depuis le
+  // revert du 12/11/2026, voir scopedClientsWide()/renderRlAgenceSubTab() plus haut — Romain n'a plus
+  // accès au département 13, donc ce filtre ne laisse plus passer que les tâches de ses propres clients).
   // Remplace l'ancien comportement V17 (vue bloquée "en cours de développement") qui datait d'avant la mise
   // en place du système de sous-onglets département.
   // Restent bloqués pour Romain, sans changement : le formulaire "Nouvelle tâche" (création non demandée)
@@ -12309,7 +12945,7 @@ function renderTab3(){
     if (fEtat && t.etat!==fEtat) return false;
     if (fCriticite && (t.criticite||"moyenne")!==fCriticite) return false;
     if (fAnnee && String(new Date(t.createdAt).getFullYear())!==fAnnee) return false;
-    // V18 — Romain (RL) : ne voit que les tâches des clients de son sous-onglet département actif (59/13).
+    // V18 — Romain (RL) : ne voit que les tâches des clients de son département 59 (rlAgenceView fixé à "59").
     if (identity==="RL"){
       const cRl = clients.find(x=>x.id===t.clientId);
       if (!cRl || cRl.departement!==rlAgenceView) return false;
