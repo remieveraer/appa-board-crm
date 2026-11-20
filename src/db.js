@@ -116,6 +116,55 @@ async function remove(collection, id) {
   await c.query("DELETE FROM documents WHERE collection = $1 AND id = $2", [collection, id]);
 }
 
+/**
+ * Alloue atomiquement le prochain entier d'un compteur nommé (ex.
+ * "clients_FORMULE_2026"), stocké comme document {value:N} dans la
+ * collection réservée "_counters". Toutes les requêtes passent par
+ * l'unique connexion PgClient de ce process, dont _enqueue() (voir
+ * pg-client.js) sérialise strictement l'exécution : même si deux requêtes
+ * HTTP arrivent au même instant (ex. deux onglets), la seconde UPDATE ne
+ * démarre qu'une fois la première terminée et son résultat écrit — donc
+ * jamais deux appels ne peuvent recevoir la même valeur. C'est ce
+ * mécanisme qui remplace le calcul fait côté client dans board.html
+ * (clients.filter(c=>c.type===type).length + 1), à l'origine du bug du
+ * 20/11/2026 : deux créations de client quasi simultanées dans deux
+ * onglets différents pouvaient calculer le même "prochain" numéro de
+ * contrat, et la seconde écrasait alors silencieusement la première
+ * (MOCHKAREFF Yves perdu par ISSOREL RENE, tous deux CLF-2026-217).
+ */
+async function nextSeq(counterId) {
+  const c = await getClient();
+  const r = await c.query(
+    "INSERT INTO documents (collection, id, data, updated_at) VALUES ('_counters', $1, '{\"value\":1}'::jsonb, now()) " +
+      "ON CONFLICT (collection, id) DO UPDATE SET data = jsonb_set(documents.data, '{value}', to_jsonb((documents.data->>'value')::int + 1)), updated_at = now() " +
+      "RETURNING (data->>'value')::int AS value",
+    [counterId]
+  );
+  return r.rows[0].value;
+}
+
+/**
+ * Crée un document SEULEMENT s'il n'existe pas déjà — contrairement à
+ * add()/set() (upsert silencieux), n'écrase jamais un document existant.
+ * Lève une erreur avec code "CONFLICT" si l'id est déjà pris, pour que
+ * l'appelant puisse réagir (ex. réessayer avec un autre id) plutôt que de
+ * perdre silencieusement les données déjà en place à cet id.
+ */
+async function addIfAbsent(collection, id, data) {
+  const c = await getClient();
+  const r = await c.query(
+    "INSERT INTO documents (collection, id, data, updated_at) VALUES ($1, $2, $3::jsonb, now()) " +
+      "ON CONFLICT (collection, id) DO NOTHING RETURNING id",
+    [collection, id, JSON.stringify(data)]
+  );
+  if (!r.rows.length) {
+    const err = new Error(`Document déjà existant: ${collection}/${id}`);
+    err.code = "CONFLICT";
+    throw err;
+  }
+  return get(collection, id);
+}
+
 function rowToDoc(row) {
   return {
     id: row.id,
@@ -124,4 +173,16 @@ function rowToDoc(row) {
   };
 }
 
-module.exports = { list, get, add, set, update, remove, listCollections, getClient, newId };
+module.exports = {
+  list,
+  get,
+  add,
+  set,
+  update,
+  remove,
+  listCollections,
+  getClient,
+  newId,
+  nextSeq,
+  addIfAbsent,
+};

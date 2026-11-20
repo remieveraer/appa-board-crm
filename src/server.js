@@ -195,6 +195,55 @@ async function handleDataRoute(req, res, session, parts, query) {
   }
 }
 
+// ---------- Création sécurisée d'un client (/api/clients) ----------
+// Fix du 20/11/2026 : remplace le calcul d'id fait côté client dans
+// board.html (clients.filter(c=>c.type===type).length + 1), à l'origine
+// d'une perte de données en production — deux créations de client quasi
+// simultanées dans deux onglets différents pouvaient calculer le même
+// "prochain" numéro de contrat, et la seconde écrasait alors
+// silencieusement la fiche entière de la première via l'ancien chemin
+// PUT /api/db/clients/:id (db.set() = upsert sans détection de collision).
+// Ici, le numéro de contrat est alloué atomiquement côté serveur
+// (db.nextSeq, voir src/db.js — la sérialisation des requêtes sur
+// l'unique connexion PgClient du process garantit qu'aucune incrémentation
+// ne peut être dupliquée même pour deux requêtes HTTP simultanées), et la
+// création est refusée — jamais écrasée — si l'id existe déjà malgré tout
+// (db.addIfAbsent), avec quelques tentatives en cas de collision
+// résiduelle (ex. données reprises manuellement hors compteur).
+const CLIENT_TYPE_RE = /^(FORMULE|HORS)$/;
+
+async function handleCreateClient(req, res, session) {
+  let body;
+  try {
+    body = await readJsonBody(req, 2 * 1024 * 1024);
+  } catch (e) {
+    if (e.message === "JSON invalide" || e.message === "Payload trop volumineux") {
+      return sendJson(res, 400, { error: e.message });
+    }
+    throw e;
+  }
+  const type = String(body.type || "");
+  if (!CLIENT_TYPE_RE.test(type)) return sendJson(res, 400, { error: "Type de client invalide" });
+  const data = body.data && typeof body.data === "object" ? body.data : {};
+  const year = new Date().getFullYear();
+  const prefix = type === "FORMULE" ? "CLF-" : "CLH-";
+  const counterId = `clients_${type}_${year}`;
+
+  const MAX_ATTEMPTS = 5;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const seq = await db.nextSeq(counterId);
+    const id = prefix + year + "-" + String(seq).padStart(3, "0");
+    try {
+      const doc = await db.addIfAbsent("clients", id, data);
+      return sendJson(res, 201, { doc });
+    } catch (e) {
+      if (e.code === "CONFLICT") continue; // numéro déjà pris (ex. donnée reprise manuellement) -> on retente avec le suivant
+      throw e;
+    }
+  }
+  return sendJson(res, 500, { error: "Impossible d'allouer un numéro de contrat disponible — contacter le support" });
+}
+
 // ---------- Documents protégés (/api/docs) ----------
 
 function docPublicMeta(d) {
@@ -366,6 +415,8 @@ const server = http.createServer(async (req, res) => {
     // Tout le reste de /api/ exige une session valide
     const session = requireSession(req);
     if (!session) return sendJson(res, 401, { error: "Non authentifié" });
+
+    if (urlPath === "/api/clients" && req.method === "POST") return await handleCreateClient(req, res, session);
 
     if (urlPath === "/api/docs" && req.method === "GET") return await handleDocsList(req, res, session);
     const docDlMatch = urlPath.match(/^\/api\/docs\/([a-zA-Z0-9_-]+)\/download$/);
