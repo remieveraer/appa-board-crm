@@ -17,9 +17,14 @@
       "passwordHash": "scrypt$e0e4d6f244300e489b669120cbe1f5dc$5cf9e2b809edaeaa510e604be0e28057788a536bc38332f1f397690e6fdf0de52c359e5c8e07ea7017c9030567b4b9e2be56f74ae5e5bf256f1dd164ca1c8d05"
     },
     {
-      "code": "II",
-      "name": "Hinda BARBARIE",
-      "passwordHash": "scrypt$ac4138208bac29ea9d24c510e55a5208$a19f7dab79690a8662b3d85df52aecb02cfd8a68547f1968b0462eef80769f867bafbde9321e75c2226f791dcedbf30fc7b0e041bbfc4d87e4945958fa6610ef"
+      "code": "OC",
+      "name": "Océane Combredet",
+      "passwordHash": "scrypt$c4b1c161a81cbf6f921b499e31bcc462$bded6e3cf6d20b42d93398e910cefdd2fe8e498ae2d59d6e4c5fed6127f9e7db8124b42339f38c4326ca01a5da4d9e7b7eaedc6526a9e42a0d6e721eee24511c"
+    },
+    {
+      "code": "CC",
+      "name": "Clara Chevillotte",
+      "passwordHash": "scrypt$8bfdcc84e183e61f65d748939adea860$497a60af8351a0c2c1d693ec874076420178e4a88471e9fb3504ee2cce10860e353bdf75d318eedd1804caffaad41dbd13c92b03f7ffae65b3c9857b5837d80c"
     },
     {
       "code": "AC",
@@ -30,11 +35,6 @@
       "code": "RL",
       "name": "Romain Lotito",
       "passwordHash": "scrypt$de33b0db5bdf297cc1d7bd54ce011539$e43e2424426e200383e7c3c21f0db57ca3d654efe251eff61a64ac881f4526c84a5ae23cb87f693d2069e49d00605510b2793336c2034391b244f4314f642124"
-    },
-    {
-      "code": "AT",
-      "name": "Assistante Terrain Alternant",
-      "passwordHash": "scrypt$192fa5959ceb4a28d5e4069afa0e3b73$4da384f85de82ac07b952dd52cdd3271cf1cf8878655b3b306ecddacf9715d024a9f3534812dcba445b65dacbac6f51cad4f3903e4c5ffa017f8e03a3dbd3855"
     }
   ],
   "generatedAt": "2026-11-03T19:56:10.580Z"
