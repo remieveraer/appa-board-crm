@@ -5937,13 +5937,18 @@ const KPI_ORG_CHART = {
   branches: [
     { label:'APPA SERVICES 59', cls:'appa59', personnes:[ {code:'RL', role:'Directeur APPA Services 59'} ], enfants:[] },
     { label:'APPA SERVICES 13', cls:'appa13', personnes:[ {code:'ME', role:'Dir. Opérationnelle & Client'}, {code:'RE', role:'DRH · Dir. Dvp · DAF'} ], enfants:[
-        {code:'CG', role:'Assistante Administrative Bureau', cls:'poste', enfants:[
-            // MAJ 20/11/2026 : II (Hinda, contrat rompu) retirée, CC (Clara Chevillotte, nouvelle
-            // alternante) ajoutée, même poste et même niveau hiérarchique (sous Cindy) qu'Océane à
-            // l'époque — confirmé par Rémi ("rôle de Clara comme Océane, sous niveau de Cindy"). Un
-            // nouvel organigramme complet doit suivre plus tard de la part de Rémi.
-            {code:'CC', role:'Assistante Coordinatrice de Terrain', cls:'poste transversal'},
-            {code:'AC', role:'Assistante RH & Développement', cls:'poste'}
+        // MAJ 20/11/2026 (correction demandée par Rémi) : structure revue en 2 branches de même niveau,
+        // Ala n'est plus "sous" Cindy — Ala (RH) et Cindy (Opérationnelle) sont désormais pairs, et Océane
+        // + Clara sont au même niveau que Cindy dans la branche Opérationnelle (toutes les 3 côte à côte,
+        // aucune n'est "sous" une autre). Un nouvel organigramme complet doit suivre plus tard de la part
+        // de Rémi — structure provisoire "au mieux" en attendant.
+        { label:'RH', cls:'poste', personnes:[
+            {code:'AC', role:'Assistante RH & Développement'}
+          ] },
+        { label:'Opérationnelle', cls:'poste transversal', personnes:[
+            {code:'CG', role:'Assistante Administrative Bureau'},
+            {code:'OC', role:'Assistante Coordinatrice de Terrain'},
+            {code:'CC', role:'Assistante Coordinatrice de Terrain'}
           ] }
       ] }
   ]
@@ -5955,10 +5960,17 @@ function kpiOrgPersonHtml(code, role){
 // Rendu RÉCURSIF d'un nœud "enfant" (et de ses propres enfants s'il en a) — permet une hiérarchie à
 // plusieurs niveaux (ex. Cindy au-dessus de Hinda/Ala) sans limiter l'organigramme à 2 rangs fixes.
 // Réutilise .org-branch (déjà utilisé pour les branches 59/13) comme simple conteneur flex-colonne, aucune
-// nouvelle classe CSS nécessaire.
+// nouvelle classe CSS nécessaire. Supporte 2 formes de nœud : une personne seule ({code,role}, comme avant)
+// OU un groupe de personnes au même niveau ({label, personnes:[{code,role},...]}, ajouté le 20/11/2026 pour
+// pouvoir afficher plusieurs personnes côte à côte à un niveau hiérarchique donné — ex. Cindy/Océane/Clara,
+// toutes pairs, dans une même "branche" Opérationnelle).
 function kpiOrgNodeHtml(e){
   let html = '<div class="org-branch">';
-  html += '<div class="org-box '+e.cls+'">'+kpiOrgPersonHtml(e.code,e.role)+'</div>';
+  if (e.personnes){
+    html += '<div class="org-box '+e.cls+'">'+(e.label?'<div class="org-branch-label">'+esc(e.label)+'</div>':'')+'<div class="org-persons-row">'+e.personnes.map(x=>kpiOrgPersonHtml(x.code,x.role)).join('')+'</div></div>';
+  } else {
+    html += '<div class="org-box '+e.cls+'">'+kpiOrgPersonHtml(e.code,e.role)+'</div>';
+  }
   if (e.enfants && e.enfants.length){
     html += '<div class="org-connector"></div>';
     html += '<div class="org-children">'+e.enfants.map(kpiOrgNodeHtml).join('')+'</div>';
