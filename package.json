@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node test/auth.test.js && node test/pg-client.test.js && node test/db.test.js",
+    "test": "node test/auth.test.js && node test/pg-client.test.js && node test/db.test.js && node test/client-creation-race.test.js",
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed-from-migration.js",
     "hash-passwords": "node scripts/hash-passwords.js"
